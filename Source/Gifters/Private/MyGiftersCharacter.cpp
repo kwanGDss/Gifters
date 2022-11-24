@@ -32,8 +32,10 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Drongo(TEXT("/Game/ParagonDrongo/Characters/Heroes/Drongo/Animations/Primary_Fire_Montage"));
 	if (AM_Drongo.Succeeded())
 	{
-		AttackMontage = AM_Drongo.Object;
+		FireMontage = AM_Drongo.Object;
 	}
+
+	//MyAnimInstance->OnMontageStarted.AddDynamic(this, &OnFireMontageStarted);
 
 	bIsAttacking = false;
 	bSaveAttack = false;
@@ -83,10 +85,26 @@ void AMyGiftersCharacter::Fire()
 	UKismetSystemLibrary::PrintString(GetWorld(), TEXT("Fire"));
 }
 
+void AMyGiftersCharacter::OnFireMontageStarted(UAnimMontage* AnimMontage)
+{
+	if (AnimMontage == FireMontage)
+	{
+		Fire();
+	}
+}
+
 void AMyGiftersCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &AMyGiftersCharacter::Attack);
+}
+
+void AMyGiftersCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	MyAnimInstance = Cast<UAnimInstance>(GetMesh()->GetAnimInstance());
+	MyAnimInstance->OnMontageStarted.AddDynamic(this, &AMyGiftersCharacter::OnFireMontageStarted);
 }
 
 void AMyGiftersCharacter::PlayAttackMontage()
@@ -95,11 +113,11 @@ void AMyGiftersCharacter::PlayAttackMontage()
 	{
 	case 0:
 		AttackCount = 1;
-		PlayAnimMontage(AttackMontage);
+		PlayAnimMontage(FireMontage);
 		break;
 	case 1:
 		AttackCount = 0;
-		PlayAnimMontage(AttackMontage);
+		PlayAnimMontage(FireMontage);
 		break;
 	default:
 		break;
