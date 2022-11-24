@@ -14,6 +14,7 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 
 	GetFollowCamera()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 200.0f), FRotator(-25.0f, 0.0f, 0.0f));
 	GetCameraBoom()->TargetArmLength = 300.0f;
+	GetCameraBoom()->bEnableCameraLag = true;
 
 	GetCharacterMovement()->JumpZVelocity = 300.0f;
 
@@ -34,8 +35,6 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	{
 		FireMontage = AM_Drongo.Object;
 	}
-
-	//MyAnimInstance->OnMontageStarted.AddDynamic(this, &OnFireMontageStarted);
 
 	bIsAttacking = false;
 	bSaveAttack = false;
