@@ -2,9 +2,11 @@
 
 
 #include "MyGiftersCharacter.h"
+#include "MyUserWidget.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -34,6 +36,12 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	if (AM_Drongo.Succeeded())
 	{
 		FireMontage = AM_Drongo.Object;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_PlayerHUD(TEXT("/Game/HUDs/PlayerHUD"));
+	if (UI_PlayerHUD.Succeeded())
+	{
+		PlayerHUDClass = UI_PlayerHUD.Class;
 	}
 
 	bIsAttacking = false;
@@ -104,6 +112,20 @@ void AMyGiftersCharacter::PostInitializeComponents()
 
 	MyAnimInstance = Cast<UAnimInstance>(GetMesh()->GetAnimInstance());
 	MyAnimInstance->OnMontageStarted.AddDynamic(this, &AMyGiftersCharacter::OnFireMontageStarted);
+}
+
+void AMyGiftersCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if(IsValid(PlayerHUDClass))
+	{
+		PlayerHUD = Cast<UUserWidget>(CreateWidget(GetWorld(), PlayerHUDClass));
+		if(IsValid(PlayerHUD))
+		{
+			PlayerHUD->AddToViewport();
+		}
+	}
 }
 
 void AMyGiftersCharacter::PlayAttackMontage()
