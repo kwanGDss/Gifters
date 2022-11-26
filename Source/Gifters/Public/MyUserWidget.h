@@ -13,5 +13,7 @@ UCLASS()
 class GIFTERS_API UMyUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+protected:
+	virtual void NativeConstruct() override;
 };

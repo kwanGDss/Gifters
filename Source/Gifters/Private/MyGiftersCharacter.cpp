@@ -38,12 +38,6 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 		FireMontage = AM_Drongo.Object;
 	}
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> UI_PlayerHUD(TEXT("/Game/HUDs/PlayerHUD"));
-	if (UI_PlayerHUD.Succeeded())
-	{
-		PlayerHUDClass = UI_PlayerHUD.Class;
-	}
-
 	bIsAttacking = false;
 	bSaveAttack = false;
 	AttackCount = 0;
@@ -118,14 +112,6 @@ void AMyGiftersCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(IsValid(PlayerHUDClass))
-	{
-		PlayerHUD = Cast<UUserWidget>(CreateWidget(GetWorld(), PlayerHUDClass));
-		if(IsValid(PlayerHUD))
-		{
-			PlayerHUD->AddToViewport();
-		}
-	}
 }
 
 void AMyGiftersCharacter::PlayAttackMontage()
