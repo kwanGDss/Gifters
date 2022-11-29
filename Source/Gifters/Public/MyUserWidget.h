@@ -14,6 +14,18 @@ class GIFTERS_API UMyUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	void BindCharacterStat(class UGiftersStatComponent* NewCharacterStat);
+
 protected:
 	virtual void NativeConstruct() override;
+
+	void UpdateHPWidget();
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = true))
+	class UGiftersStatComponent* CurrentCharacterStat;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowPrivateAccess = true))
+	class UProgressBar* HPProgressBar;
 };

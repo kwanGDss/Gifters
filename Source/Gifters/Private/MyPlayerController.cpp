@@ -3,6 +3,7 @@
 
 #include "MyPlayerController.h"
 #include "MyUserWidget.h"
+#include "MyGiftersCharacter.h"
 
 AMyPlayerController::AMyPlayerController()
 {
@@ -18,19 +19,31 @@ void AMyPlayerController::PostInitializeComponents()
 	Super::PostInitializeComponents();
 }
 
+void AMyPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	PlayerCharacter = Cast<AMyGiftersCharacter>(InPawn);
+}
+
 void AMyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	FloatPlayerHUD();
+	PlayerHUD->BindCharacterStat(PlayerCharacter->GetCharacterStat());
+}
+
+void AMyPlayerController::FloatPlayerHUD()
+{
 	if (IsValid(PlayerHUDClass))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AMyPlayerController::BeginPlay()"));
 		PlayerHUD = Cast<UMyUserWidget>(CreateWidget(GetWorld(), PlayerHUDClass));
 
 		if (IsValid(PlayerHUD))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("AMyPlayerController::AddToViewport()"));
 			PlayerHUD->AddToViewport();
+			UE_LOG(LogTemp, Warning, TEXT("AddToViewport"));
 		}
 	}
 }

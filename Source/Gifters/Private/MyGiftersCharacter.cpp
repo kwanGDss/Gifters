@@ -9,6 +9,7 @@
 #include "Components/WidgetComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "GiftersStatComponent.h"
 
 AMyGiftersCharacter::AMyGiftersCharacter()
 {
@@ -37,6 +38,8 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	{
 		FireMontage = AM_Drongo.Object;
 	}
+
+	CharacterStat = CreateDefaultSubobject<UGiftersStatComponent>(TEXT("CharacterStat"));
 
 	bIsAttacking = false;
 	bSaveAttack = false;
@@ -94,10 +97,21 @@ void AMyGiftersCharacter::OnFireMontageStarted(UAnimMontage* AnimMontage)
 	}
 }
 
+UGiftersStatComponent* AMyGiftersCharacter::GetCharacterStat()
+{
+	if(CharacterStat != nullptr)
+	{
+		return CharacterStat;
+	}
+
+	return nullptr;
+}
+
 void AMyGiftersCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &AMyGiftersCharacter::Attack);
+	PlayerInputComponent->BindAction("DamagedBySelf", IE_Pressed, this, &AMyGiftersCharacter::DamagedBySelf);
 }
 
 void AMyGiftersCharacter::PostInitializeComponents()
@@ -130,3 +144,11 @@ void AMyGiftersCharacter::PlayAttackMontage()
 		break;
 	}
 }
+
+//TEST
+void AMyGiftersCharacter::DamagedBySelf()
+{
+	UE_LOG(LogTemp, Warning, TEXT("DamagedBySelf"));
+	CharacterStat->DecreaseHP(10.0f);
+}
+

@@ -18,11 +18,17 @@ public:
 	AMyPlayerController();
 
 	virtual void PostInitializeComponents() override;
+	virtual void OnPossess(APawn* InPawn) override;
+
+	void FloatPlayerHUD();
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = true))
+	class AMyGiftersCharacter* PlayerCharacter;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowPrivateAccess = true))
 	TSubclassOf<UUserWidget> PlayerHUDClass;
 
