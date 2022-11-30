@@ -11,6 +11,7 @@ UGiftersStatComponent::UGiftersStatComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	HealthPoint = 100.0f;
+	StaminaPoint = 100.0f;
 }
 
 // Called when the game starts
@@ -44,7 +45,26 @@ void UGiftersStatComponent::DecreaseHP(float HP)
 	OnHPChanged.Broadcast();
 }
 
+void UGiftersStatComponent::IncreaseSP(float SP)
+{
+	StaminaPoint += SP;
+	StaminaPoint = FMath::Clamp(StaminaPoint, 0.0f, 100.0f);
+	OnSPChanged.Broadcast();
+}
+
+void UGiftersStatComponent::DecreaseSP(float SP)
+{
+	StaminaPoint -= SP;
+	StaminaPoint = FMath::Clamp(StaminaPoint, 0.0f, 100.0f);
+	OnSPChanged.Broadcast();
+}
+
 float UGiftersStatComponent::GetHP()
 {
 	return HealthPoint;
+}
+
+float UGiftersStatComponent::GetSP()
+{
+	return StaminaPoint;
 }

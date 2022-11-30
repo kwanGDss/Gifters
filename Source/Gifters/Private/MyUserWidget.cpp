@@ -9,6 +9,7 @@ void UMyUserWidget::BindCharacterStat(UGiftersStatComponent* NewCharacterStat)
 {
 	CurrentCharacterStat = NewCharacterStat;
 	NewCharacterStat->OnHPChanged.AddUObject(this, &UMyUserWidget::UpdateHPWidget);
+	NewCharacterStat->OnSPChanged.AddUObject(this, &UMyUserWidget::UpdateSPWidget);
 }
 
 void UMyUserWidget::NativeConstruct()
@@ -16,7 +17,9 @@ void UMyUserWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	HPProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HealthBar")));
+	SPProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("StaminaBar")));
 	UpdateHPWidget();
+	UpdateSPWidget();
 }
 
 void UMyUserWidget::UpdateHPWidget()
@@ -25,8 +28,18 @@ void UMyUserWidget::UpdateHPWidget()
 	{
 		if (IsValid(HPProgressBar))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("SetPercent_HP : %f"), CurrentCharacterStat->GetHP() / 100.0f);
 			HPProgressBar->SetPercent(CurrentCharacterStat->GetHP()/100.0f);
+		}
+	}
+}
+
+void UMyUserWidget::UpdateSPWidget()
+{
+	if (IsValid(CurrentCharacterStat))
+	{
+		if (IsValid(SPProgressBar))
+		{
+			SPProgressBar->SetPercent(CurrentCharacterStat->GetSP() / 100.0f);
 		}
 	}
 }

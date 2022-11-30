@@ -11,6 +11,13 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "GiftersStatComponent.h"
 
+#define NEED_STAMINA_JUMP 20.0f
+#define NEED_STAMINA_RUN 10.0f
+#define RESTORE_STAMINA 10.0f
+#define LEAST_NEED_STAMINA_RUN 10.0f
+#define MAX_STAMINA_POINT 100.0f
+#define MAX_HEALTH_POINT 100.0f
+
 AMyGiftersCharacter::AMyGiftersCharacter()
 {
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -97.0f), FRotator(0.0f, -90.0f, 0.0f));
@@ -44,6 +51,44 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	bIsAttacking = false;
 	bSaveAttack = false;
 	AttackCount = 0;
+	bPressedShift = false;
+	bIsRunning = false;
+	bRestoreStamina = true;
+}
+
+void AMyGiftersCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	//Running
+	if (bIsRunning)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RUNNING"));
+		CharacterStat->DecreaseSP(NEED_STAMINA_RUN * DeltaTime);
+		bRestoreStamina = false;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NOT RUNNING"));
+		bRestoreStamina = true;
+	}
+
+	if (GetCharacterStat()->GetSP() <= KINDA_SMALL_NUMBER)
+	{
+		bIsRunning = false;
+		bRestoreStamina = true;
+	}
+
+	if (GetCharacterMovement()->IsFalling())
+	{
+		bRestoreStamina = false;
+	}
+
+	//Restore Stamina
+	if (bRestoreStamina)
+	{
+		CharacterStat->IncreaseSP(RESTORE_STAMINA * DeltaTime);
+	}
 }
 
 void AMyGiftersCharacter::Attack()
@@ -99,7 +144,7 @@ void AMyGiftersCharacter::OnFireMontageStarted(UAnimMontage* AnimMontage)
 
 UGiftersStatComponent* AMyGiftersCharacter::GetCharacterStat()
 {
-	if(CharacterStat != nullptr)
+	if (CharacterStat != nullptr)
 	{
 		return CharacterStat;
 	}
@@ -107,11 +152,44 @@ UGiftersStatComponent* AMyGiftersCharacter::GetCharacterStat()
 	return nullptr;
 }
 
+void AMyGiftersCharacter::Run()
+{
+	bPressedShift = true;
+
+	if (CharacterStat->GetSP() >= KINDA_SMALL_NUMBER)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 750.f;
+		bIsRunning = true;
+	}
+}
+
+void AMyGiftersCharacter::Walk()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	bPressedShift = false;
+	bIsRunning = false;
+}
+
+void AMyGiftersCharacter::Jump()
+{
+	if (CharacterStat->GetSP() > NEED_STAMINA_JUMP)
+	{
+		Super::Jump();
+		CharacterStat->DecreaseSP(NEED_STAMINA_JUMP);
+	}
+}
+
 void AMyGiftersCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &AMyGiftersCharacter::Attack);
 	PlayerInputComponent->BindAction("DamagedBySelf", IE_Pressed, this, &AMyGiftersCharacter::DamagedBySelf);
+
+	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &AMyGiftersCharacter::Run);
+	PlayerInputComponent->BindAction("Run", IE_Released, this, &AMyGiftersCharacter::Walk);
+
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AMyGiftersCharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 }
 
 void AMyGiftersCharacter::PostInitializeComponents()

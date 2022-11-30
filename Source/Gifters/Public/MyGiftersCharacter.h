@@ -17,6 +17,8 @@ class GIFTERS_API AMyGiftersCharacter : public AGiftersCharacter
 public:
 	AMyGiftersCharacter();
 
+	virtual void Tick(float DeltaTime) override;
+
 	UFUNCTION(BlueprintCallable)
 	void Attack();
 
@@ -33,6 +35,12 @@ public:
 	void OnFireMontageStarted(UAnimMontage* AnimMontage);
 
 	class UGiftersStatComponent* GetCharacterStat();
+
+	void Run();
+
+	void Walk();
+
+	void Jump();
 
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -63,4 +71,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = true))
 	class UGiftersStatComponent* CharacterStat;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = true))
+	bool bIsRunning;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = true))
+	bool bPressedShift;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = true))
+	bool bRestoreStamina;
 };
