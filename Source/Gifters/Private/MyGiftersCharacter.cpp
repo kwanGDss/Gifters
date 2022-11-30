@@ -75,6 +75,7 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 
 	if (GetCharacterStat()->GetSP() <= KINDA_SMALL_NUMBER)
 	{
+		GetCharacterMovement()->MaxWalkSpeed = 500.0f;
 		bIsRunning = false;
 		bRestoreStamina = true;
 	}
