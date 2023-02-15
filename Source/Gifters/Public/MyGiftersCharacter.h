@@ -42,10 +42,15 @@ public:
 
 	void Jump();
 
+	void ChangeCombatPose();
+
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
+
+	virtual void MoveForward(float Value) override;
+	virtual void MoveRight(float Value) override;
 
 private:
 	void PlayAttackMontage();
@@ -80,4 +85,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = true))
 	bool bRestoreStamina;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
+	bool bIsCombat;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Move", meta = (AllowPrivateAccess = true))
+	float MoveForwardValue;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Move", meta = (AllowPrivateAccess = true))
+	float MoveRightValue;
 };

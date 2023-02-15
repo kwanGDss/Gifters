@@ -28,10 +28,10 @@ public:
 protected:
 
 	/** Called for forwards/backward input */
-	void MoveForward(float Value);
+	virtual void MoveForward(float Value);
 
 	/** Called for side to side input */
-	void MoveRight(float Value);
+	virtual void MoveRight(float Value);
 
 	/** 
 	 * Called via input to turn at a given rate. 

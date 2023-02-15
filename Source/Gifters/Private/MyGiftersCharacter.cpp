@@ -27,6 +27,8 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	GetCameraBoom()->bEnableCameraLag = true;
 
 	GetCharacterMovement()->JumpZVelocity = 300.0f;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Drongo(TEXT("/Game/ParagonDrongo/Characters/Heroes/Drongo/Meshes/Drongo_GDC"));
 	if (SK_Drongo.Succeeded())
@@ -54,6 +56,7 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	bPressedShift = false;
 	bIsRunning = false;
 	bRestoreStamina = true;
+	bIsCombat = false;
 }
 
 void AMyGiftersCharacter::Tick(float DeltaTime)
@@ -63,13 +66,11 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 	//Running
 	if (bIsRunning)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("RUNNING"));
 		CharacterStat->DecreaseSP(NEED_STAMINA_RUN * DeltaTime);
 		bRestoreStamina = false;
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NOT RUNNING"));
 		bRestoreStamina = true;
 	}
 
@@ -131,7 +132,7 @@ void AMyGiftersCharacter::Fire()
 	TArray<AActor*> IgnoreActors;
 
 	UKismetSystemLibrary::LineTraceSingleByProfile(GetWorld(), StartedFire, EndedFire, "Fire", false, IgnoreActors, EDrawDebugTrace::ForOneFrame, HitResult, true);
-	UKismetSystemLibrary::DrawDebugBox(GetWorld(), StartedFire, FVector::OneVector, FLinearColor::Red, FRotator::ZeroRotator, 10.0f);
+	//UKismetSystemLibrary::DrawDebugBox(GetWorld(), StartedFire, FVector::OneVector, FLinearColor::Red, FRotator::ZeroRotator, 10.0f);
 	UKismetSystemLibrary::PrintString(GetWorld(), TEXT("Fire"));
 }
 
@@ -180,9 +181,26 @@ void AMyGiftersCharacter::Jump()
 	}
 }
 
+void AMyGiftersCharacter::ChangeCombatPose()
+{
+	if(bIsCombat)
+	{
+		bIsCombat = false;
+		GetCharacterMovement()->bOrientRotationToMovement = true;
+	}
+	else
+	{
+		bIsCombat = true;
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+	}
+}
+
 void AMyGiftersCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	PlayerInputComponent->BindAxis("Move Forward / Backward", this, &AMyGiftersCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("Move Right / Left", this, &AMyGiftersCharacter::MoveRight);
+
 	PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &AMyGiftersCharacter::Attack);
 	PlayerInputComponent->BindAction("DamagedBySelf", IE_Pressed, this, &AMyGiftersCharacter::DamagedBySelf);
 
@@ -191,6 +209,8 @@ void AMyGiftersCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AMyGiftersCharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+
+	PlayerInputComponent->BindAction("Combat", IE_Pressed, this, &AMyGiftersCharacter::ChangeCombatPose);
 }
 
 void AMyGiftersCharacter::PostInitializeComponents()
@@ -205,6 +225,20 @@ void AMyGiftersCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+}
+
+void AMyGiftersCharacter::MoveForward(float Value)
+{
+	Super::MoveForward(Value);
+
+	MoveForwardValue = Value;
+}
+
+void AMyGiftersCharacter::MoveRight(float Value)
+{
+	Super::MoveRight(Value);
+
+	MoveRightValue = Value;
 }
 
 void AMyGiftersCharacter::PlayAttackMontage()

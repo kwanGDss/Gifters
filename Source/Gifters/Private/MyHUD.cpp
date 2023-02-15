@@ -29,7 +29,6 @@ void AMyHUD::PostInitializeComponents()
 		}
 	}
 }
-
 //void AMyHUD::DrawHUD()
 //{
 //
