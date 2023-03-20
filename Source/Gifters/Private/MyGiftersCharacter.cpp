@@ -30,6 +30,10 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 
+	PistolStartPoint = CreateDefaultSubobject<USceneComponent>(TEXT("PistolStartPoint"));
+	PistolStartPoint->SetupAttachment(GetMesh(), TEXT("pistol_cylinder"));
+	PistolStartPoint->SetRelativeLocation(FVector(0.0f, 20.0f, 0.0f));
+
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Drongo(TEXT("/Game/ParagonDrongo/Characters/Heroes/Drongo/Meshes/Drongo_GDC"));
 	if (SK_Drongo.Succeeded())
 	{
@@ -127,13 +131,14 @@ void AMyGiftersCharacter::ResetCombo()
 void AMyGiftersCharacter::Fire()
 {
 	FHitResult HitResult;
-	FVector StartedFire = UKismetMathLibrary::TransformLocation(GetActorTransform(), FVector(100.0f, 20.0f, 57.0f));
-	FVector EndedFire = GetActorForwardVector() * 15000.0f + StartedFire;
+	FVector StartedFire = PistolStartPoint->GetComponentLocation();
+	FVector EndedFire = StartedFire + PistolStartPoint->GetRightVector() * 15000.0f;
 	TArray<AActor*> IgnoreActors;
 
-	UKismetSystemLibrary::LineTraceSingleByProfile(GetWorld(), StartedFire, EndedFire, "Fire", false, IgnoreActors, EDrawDebugTrace::ForOneFrame, HitResult, true);
-	//UKismetSystemLibrary::DrawDebugBox(GetWorld(), StartedFire, FVector::OneVector, FLinearColor::Red, FRotator::ZeroRotator, 10.0f);
-	UKismetSystemLibrary::PrintString(GetWorld(), TEXT("Fire"));
+	GetWorld()->LineTraceSingleByProfile(HitResult, StartedFire, EndedFire, "Fire");
+	DrawDebugLine(GetWorld(), StartedFire, EndedFire, FColor::Red, false, 5.0f, 0, 5.0f);
+	UKismetSystemLibrary::DrawDebugBox(GetWorld(), StartedFire, FVector::OneVector, FLinearColor::Red, FRotator::ZeroRotator, 10.0f);
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Fire"));
 }
 
 void AMyGiftersCharacter::OnFireMontageStarted(UAnimMontage* AnimMontage)
@@ -225,6 +230,7 @@ void AMyGiftersCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("BeginPlay"));
 }
 
 void AMyGiftersCharacter::MoveForward(float Value)
