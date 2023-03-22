@@ -17,6 +17,7 @@
 #define LEAST_NEED_STAMINA_RUN 10.0f
 #define MAX_STAMINA_POINT 100.0f
 #define MAX_HEALTH_POINT 100.0f
+#define COMBAT_POSE_CAMERA_DISTANCE 100.0f
 
 AMyGiftersCharacter::AMyGiftersCharacter()
 {
@@ -99,15 +100,18 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 
 void AMyGiftersCharacter::Attack()
 {
-	if (bIsAttacking)
+	if (bIsCombat)
 	{
-		bSaveAttack = true;
-	}
-	else
-	{
-		bIsAttacking = true;
+		if (bIsAttacking)
+		{
+			bSaveAttack = true;
+		}
+		else
+		{
+			bIsAttacking = true;
 
-		PlayAttackMontage();
+			PlayAttackMontage();
+		}
 	}
 }
 
@@ -143,15 +147,12 @@ void AMyGiftersCharacter::Fire()
 	//else
 	{
 		StartedFire = PistolStartPoint->GetComponentLocation();
-		EndedFire = StartedFire + PistolStartPoint->GetForwardVector() * 15000.0f;
+		EndedFire = StartedFire + GetFollowCamera()->GetForwardVector() * 15000.0f;
 	}
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("%s"), *PistolStartPoint->GetComponentLocation().ToString()));
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *GetActorLocation().ToString());
 
 	GetWorld()->LineTraceSingleByProfile(HitResult, StartedFire, EndedFire, "Fire");
 	DrawDebugLine(GetWorld(), StartedFire, EndedFire, FColor::Red, false, 5.0f, 0, 5.0f);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Fire"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Fire")); 
 }
 
 void AMyGiftersCharacter::OnFireMontageStarted(UAnimMontage* AnimMontage)
@@ -204,11 +205,13 @@ void AMyGiftersCharacter::ChangeCombatPose()
 	if(bIsCombat)
 	{
 		bIsCombat = false;
+		GetFollowCamera()->AddRelativeLocation(FVector(0.0f, -COMBAT_POSE_CAMERA_DISTANCE, 0.0f));
 		GetCharacterMovement()->bOrientRotationToMovement = true;
 	}
 	else
 	{
 		bIsCombat = true;
+		GetFollowCamera()->AddRelativeLocation(FVector(0.0f, COMBAT_POSE_CAMERA_DISTANCE, 0.0f));
 		GetCharacterMovement()->bOrientRotationToMovement = false;
 	}
 }
