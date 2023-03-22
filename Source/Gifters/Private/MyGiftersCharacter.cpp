@@ -32,7 +32,7 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 
 	PistolStartPoint = CreateDefaultSubobject<USceneComponent>(TEXT("PistolStartPoint"));
 	PistolStartPoint->SetupAttachment(GetMesh(), TEXT("pistol_cylinder"));
-	PistolStartPoint->SetRelativeLocation(FVector(0.0f, 20.0f, 0.0f));
+	PistolStartPoint->SetRelativeLocationAndRotation(FVector(0.0f, 20.0f, 0.0f), FRotator(0.0f, 90.0f, 0.0f));
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Drongo(TEXT("/Game/ParagonDrongo/Characters/Heroes/Drongo/Meshes/Drongo_GDC"));
 	if (SK_Drongo.Succeeded())
@@ -131,22 +131,35 @@ void AMyGiftersCharacter::ResetCombo()
 void AMyGiftersCharacter::Fire()
 {
 	FHitResult HitResult;
-	FVector StartedFire = PistolStartPoint->GetComponentLocation();
-	FVector EndedFire = StartedFire + PistolStartPoint->GetRightVector() * 15000.0f;
+	FVector StartedFire;
+	FVector EndedFire;
 	TArray<AActor*> IgnoreActors;
+
+	//if(bIsCombat == false)
+	//{
+	//	StartedFire = PistolStartPoint();
+	//	EndedFire = StartedFire + GetCameraBoom()->GetForwardVector() * 15000.0f;
+	//}
+	//else
+	{
+		StartedFire = PistolStartPoint->GetComponentLocation();
+		EndedFire = StartedFire + PistolStartPoint->GetForwardVector() * 15000.0f;
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("%s"), *PistolStartPoint->GetComponentLocation().ToString()));
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *GetActorLocation().ToString());
 
 	GetWorld()->LineTraceSingleByProfile(HitResult, StartedFire, EndedFire, "Fire");
 	DrawDebugLine(GetWorld(), StartedFire, EndedFire, FColor::Red, false, 5.0f, 0, 5.0f);
-	UKismetSystemLibrary::DrawDebugBox(GetWorld(), StartedFire, FVector::OneVector, FLinearColor::Red, FRotator::ZeroRotator, 10.0f);
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Fire"));
 }
 
 void AMyGiftersCharacter::OnFireMontageStarted(UAnimMontage* AnimMontage)
 {
-	if (AnimMontage == FireMontage)
-	{
-		Fire();
-	}
+	//if (AnimMontage == FireMontage)
+	//{
+	//	Fire();
+	//}
 }
 
 UGiftersStatComponent* AMyGiftersCharacter::GetCharacterStat()
