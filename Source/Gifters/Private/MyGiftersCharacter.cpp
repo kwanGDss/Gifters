@@ -18,12 +18,15 @@
 #define MAX_STAMINA_POINT 100.0f
 #define MAX_HEALTH_POINT 100.0f
 #define COMBAT_POSE_CAMERA_DISTANCE 100.0f
+#define PISTOL_RANGE 15000.0f
+#define AIM_DOWN_POS FVector(0.0f, 50.0f, 30.0f)
+#define CHARACTER_CAMERA_POS FVector(0.0f, 0.0f, 50.0f)
 
 AMyGiftersCharacter::AMyGiftersCharacter()
 {
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -97.0f), FRotator(0.0f, -90.0f, 0.0f));
 
-	GetFollowCamera()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 200.0f), FRotator(-25.0f, 0.0f, 0.0f));
+	GetFollowCamera()->SetRelativeLocationAndRotation(CHARACTER_CAMERA_POS, FRotator(0.0f, 0.0f, 0.0f));
 	GetCameraBoom()->TargetArmLength = 300.0f;
 	GetCameraBoom()->bEnableCameraLag = true;
 
@@ -34,6 +37,12 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	PistolStartPoint = CreateDefaultSubobject<USceneComponent>(TEXT("PistolStartPoint"));
 	PistolStartPoint->SetupAttachment(GetMesh(), TEXT("pistol_cylinder"));
 	PistolStartPoint->SetRelativeLocationAndRotation(FVector(0.0f, 20.0f, 0.0f), FRotator(0.0f, 90.0f, 0.0f));
+
+	//AimingCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("AimingCameraBoom"));
+	//AimingCameraBoom->SetupAttachment(RootComponent);
+	//AimingCameraBoom->bUsePawnControlRotation = true;
+	//AimingCameraBoom->SocketOffset = FVector(0.0f, 200.0f, 0.0f);
+	//AimingCameraBoom->TargetArmLength = 150.0f;
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Drongo(TEXT("/Game/ParagonDrongo/Characters/Heroes/Drongo/Meshes/Drongo_GDC"));
 	if (SK_Drongo.Succeeded())
@@ -62,6 +71,7 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	bIsRunning = false;
 	bRestoreStamina = true;
 	bIsCombat = false;
+	bIsChangingPose = false;
 }
 
 void AMyGiftersCharacter::Tick(float DeltaTime)
@@ -95,6 +105,26 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 	if (bRestoreStamina)
 	{
 		CharacterStat->IncreaseSP(RESTORE_STAMINA * DeltaTime);
+	}
+
+	//Camera movement due to pose change
+	if (bIsChangingPose == true && bIsCombat == true)
+	{
+		GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, AIM_DOWN_POS, DeltaTime, 10.0f));
+
+		if(FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS + AIM_DOWN_POS) <=0.1f)
+		{
+			bIsChangingPose = false;
+		}
+	}
+	else if(bIsChangingPose == true && bIsCombat == false)
+	{
+		GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, -AIM_DOWN_POS, DeltaTime, 10.0f));
+
+		if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS) <= 0.1f)
+		{
+			bIsChangingPose = false;
+		}
 	}
 }
 
@@ -142,17 +172,17 @@ void AMyGiftersCharacter::Fire()
 	//if(bIsCombat == false)
 	//{
 	//	StartedFire = PistolStartPoint();
-	//	EndedFire = StartedFire + GetCameraBoom()->GetForwardVector() * 15000.0f;
+	//	EndedFire = StartedFire + GetCameraBoom()->GetForwardVector() * PISTOL_RANGE;
 	//}
 	//else
 	{
 		StartedFire = PistolStartPoint->GetComponentLocation();
-		EndedFire = StartedFire + GetFollowCamera()->GetForwardVector() * 15000.0f;
+		EndedFire = StartedFire + GetFollowCamera()->GetForwardVector() * PISTOL_RANGE;
 	}
 
 	GetWorld()->LineTraceSingleByProfile(HitResult, StartedFire, EndedFire, "Fire");
 	DrawDebugLine(GetWorld(), StartedFire, EndedFire, FColor::Red, false, 5.0f, 0, 5.0f);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Fire")); 
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Fire"));
 }
 
 void AMyGiftersCharacter::OnFireMontageStarted(UAnimMontage* AnimMontage)
@@ -202,18 +232,26 @@ void AMyGiftersCharacter::Jump()
 
 void AMyGiftersCharacter::ChangeCombatPose()
 {
-	if(bIsCombat)
-	{
-		bIsCombat = false;
-		GetFollowCamera()->AddRelativeLocation(FVector(0.0f, -COMBAT_POSE_CAMERA_DISTANCE, 0.0f));
-		GetCharacterMovement()->bOrientRotationToMovement = true;
-	}
-	else
-	{
-		bIsCombat = true;
-		GetFollowCamera()->AddRelativeLocation(FVector(0.0f, COMBAT_POSE_CAMERA_DISTANCE, 0.0f));
-		GetCharacterMovement()->bOrientRotationToMovement = false;
-	}
+	bIsCombat = true;
+	bIsChangingPose = true;
+
+	GetCameraBoom()->TargetArmLength = 70.0f;
+	//GetFollowCamera()->AddRelativeLocation(AIM_DOWN_POS);
+	GetCameraBoom()->bEnableCameraLag = false;
+	//GetFollowCamera()->MoveComponent()
+	//UKismetSystemLibrary::MoveComponentTo(GetFollowCamera(), FVector::ZeroVector, FRotator::ZeroRotator, true, true, 0.3f,);
+	//bIsChangingPose = true;
+	//GetFollowCamera()->SetRelativeLocation(FMath::VInterpTo(GetFollowCamera()->GetRelativeLocation(), GetFollowCamera()->GetRelativeLocation() + FVector(0.0f, COMBAT_POSE_CAMERA_DISTANCE, 0.0f), GetWorld()->GetDeltaSeconds(), 5.0f));
+}
+
+void AMyGiftersCharacter::ChangeNonCombatPose()
+{
+	bIsCombat = false;
+	bIsChangingPose = true;
+
+	GetCameraBoom()->TargetArmLength = 300.0f;
+	//GetFollowCamera()->AddRelativeLocation(-AIM_DOWN_POS);
+	GetCameraBoom()->bEnableCameraLag = true;
 }
 
 void AMyGiftersCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -232,6 +270,7 @@ void AMyGiftersCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	PlayerInputComponent->BindAction("Combat", IE_Pressed, this, &AMyGiftersCharacter::ChangeCombatPose);
+	PlayerInputComponent->BindAction("Combat", IE_Released, this, &AMyGiftersCharacter::ChangeNonCombatPose);
 }
 
 void AMyGiftersCharacter::PostInitializeComponents()

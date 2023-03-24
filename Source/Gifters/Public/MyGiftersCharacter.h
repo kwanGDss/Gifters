@@ -45,6 +45,8 @@ public:
 
 	void ChangeCombatPose();
 
+	void ChangeNonCombatPose();
+
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitializeComponents() override;
@@ -98,4 +100,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	USceneComponent* PistolStartPoint;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Attack", meta = (AllowPrivateAccess = true))
+	bool bIsChangingPose;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Attack", meta = (AllowPrivateAccess = true))
+	USpringArmComponent* AimingCameraBoom;
 };
