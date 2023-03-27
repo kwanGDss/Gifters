@@ -10,6 +10,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GiftersStatComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystem.h"
 
 #define NEED_STAMINA_JUMP 20.0f
 #define NEED_STAMINA_RUN 10.0f
@@ -18,7 +20,7 @@
 #define MAX_STAMINA_POINT 100.0f
 #define MAX_HEALTH_POINT 100.0f
 #define COMBAT_POSE_CAMERA_DISTANCE 100.0f
-#define PISTOL_RANGE 15000.0f
+#define PISTOL_RANGE 50000.0f;
 #define AIM_DOWN_POS FVector(0.0f, 50.0f, 30.0f)
 #define CHARACTER_CAMERA_POS FVector(0.0f, 0.0f, 50.0f)
 
@@ -60,6 +62,13 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	if (AM_Drongo.Succeeded())
 	{
 		FireMontage = AM_Drongo.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> P_MuzzleFlash(TEXT("/Game/ParagonDrongo/FX/Particles/Abilities/Primary/FX/P_Drongo_Primary_MuzzleFlash"));
+	if(P_MuzzleFlash.Succeeded())
+	{
+		MuzzleFire = P_MuzzleFlash.Object;
+		UE_LOG(LogTemp, Warning, TEXT("good "));
 	}
 
 	CharacterStat = CreateDefaultSubobject<UGiftersStatComponent>(TEXT("CharacterStat"));
@@ -112,16 +121,16 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 	{
 		GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, AIM_DOWN_POS, DeltaTime, 10.0f));
 
-		if(FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS + AIM_DOWN_POS) <=0.1f)
+		if (FVector::Dist(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS + AIM_DOWN_POS) <= 0.1f)
 		{
 			bIsChangingPose = false;
 		}
 	}
-	else if(bIsChangingPose == true && bIsCombat == false)
+	else if (bIsChangingPose == true && bIsCombat == false)
 	{
 		GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, -AIM_DOWN_POS, DeltaTime, 10.0f));
 
-		if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS) <= 0.1f)
+		if (FVector::Dist(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS) <= 0.1f)
 		{
 			bIsChangingPose = false;
 		}
@@ -169,16 +178,9 @@ void AMyGiftersCharacter::Fire()
 	FVector EndedFire;
 	TArray<AActor*> IgnoreActors;
 
-	//if(bIsCombat == false)
-	//{
-	//	StartedFire = PistolStartPoint();
-	//	EndedFire = StartedFire + GetCameraBoom()->GetForwardVector() * PISTOL_RANGE;
-	//}
-	//else
-	{
-		StartedFire = PistolStartPoint->GetComponentLocation();
-		EndedFire = StartedFire + GetFollowCamera()->GetForwardVector() * PISTOL_RANGE;
-	}
+	StartedFire = PistolStartPoint->GetComponentLocation();
+	EndedFire = StartedFire + GetFollowCamera()->GetForwardVector() * PISTOL_RANGE;
+	UGameplayStatics::SpawnEmitterAttached(MuzzleFire, PistolStartPoint);
 
 	GetWorld()->LineTraceSingleByProfile(HitResult, StartedFire, EndedFire, "Fire");
 	DrawDebugLine(GetWorld(), StartedFire, EndedFire, FColor::Red, false, 5.0f, 0, 5.0f);
@@ -187,10 +189,7 @@ void AMyGiftersCharacter::Fire()
 
 void AMyGiftersCharacter::OnFireMontageStarted(UAnimMontage* AnimMontage)
 {
-	//if (AnimMontage == FireMontage)
-	//{
-	//	Fire();
-	//}
+
 }
 
 UGiftersStatComponent* AMyGiftersCharacter::GetCharacterStat()

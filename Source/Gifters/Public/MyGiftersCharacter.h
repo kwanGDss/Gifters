@@ -78,7 +78,7 @@ private:
 	UAnimInstance* MyAnimInstance;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = true))
-	class UGiftersStatComponent* CharacterStat;
+	UGiftersStatComponent* CharacterStat;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = true))
 	bool bIsRunning;
@@ -104,6 +104,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Attack", meta = (AllowPrivateAccess = true))
 	bool bIsChangingPose;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Attack", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Camera", meta = (AllowPrivateAccess = true))
 	USpringArmComponent* AimingCameraBoom;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Particle", meta = (AllowPrivateAccess = true))
+	class UParticleSystem* MuzzleFire;
 };
