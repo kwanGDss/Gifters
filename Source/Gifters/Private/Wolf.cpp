@@ -3,6 +3,8 @@
 
 #include "Wolf.h"
 
+#include "Components/CapsuleComponent.h"
+
 // Sets default values
 AWolf::AWolf()
 {
@@ -10,6 +12,7 @@ AWolf::AWolf()
 	PrimaryActorTick.bCanEverTick = true;
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -85.674369f), FRotator(0.0f, -90.0f, 0.0f));
+	GetMesh()->SetCollisionProfileName(TEXT("Monster"));
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Wolf(TEXT("/Game/QuadrapedCreatures/Barghest/Meshes/SK_BARGHEST"));
 	if (SK_Wolf.Succeeded())
@@ -23,7 +26,8 @@ AWolf::AWolf()
 void AWolf::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	UE_LOG(LogTemp, Warning, TEXT("Monster"));
 }
 
 // Called every frame

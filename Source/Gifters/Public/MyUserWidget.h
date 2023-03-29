@@ -22,6 +22,7 @@ protected:
 
 	void UpdateHPWidget();
 	void UpdateSPWidget();
+	void UpdatePose();
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = true))
@@ -31,5 +32,8 @@ private:
 	class UProgressBar* HPProgressBar;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowPrivateAccess = true))
-	class UProgressBar* SPProgressBar;
+	UProgressBar* SPProgressBar;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowPrivateAccess = true))
+	class UImage* Crosshair;
 };

@@ -12,6 +12,7 @@ UGiftersStatComponent::UGiftersStatComponent()
 
 	HealthPoint = 100.0f;
 	StaminaPoint = 100.0f;
+	bIsCombat = false;
 }
 
 // Called when the game starts
@@ -67,4 +68,15 @@ float UGiftersStatComponent::GetHP()
 float UGiftersStatComponent::GetSP()
 {
 	return StaminaPoint;
+}
+
+void UGiftersStatComponent::ChangePose(bool Pose)
+{
+	bIsCombat = Pose;
+	OnPoseChanged.Broadcast();
+}
+
+bool UGiftersStatComponent::GetPose()
+{
+	return bIsCombat;
 }

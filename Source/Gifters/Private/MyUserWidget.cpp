@@ -4,12 +4,14 @@
 #include "MyUserWidget.h"
 #include "GiftersStatComponent.h"
 #include "Components/ProgressBar.h"
+#include "Components/Image.h"
 
 void UMyUserWidget::BindCharacterStat(UGiftersStatComponent* NewCharacterStat)
 {
 	CurrentCharacterStat = NewCharacterStat;
 	NewCharacterStat->OnHPChanged.AddUObject(this, &UMyUserWidget::UpdateHPWidget);
 	NewCharacterStat->OnSPChanged.AddUObject(this, &UMyUserWidget::UpdateSPWidget);
+	NewCharacterStat->OnPoseChanged.AddUObject(this, &UMyUserWidget::UpdatePose);
 }
 
 void UMyUserWidget::NativeConstruct()
@@ -18,8 +20,11 @@ void UMyUserWidget::NativeConstruct()
 
 	HPProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HealthBar")));
 	SPProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("StaminaBar")));
+	Crosshair = Cast<UImage>(GetWidgetFromName(TEXT("Crosshairs")));
+
 	UpdateHPWidget();
 	UpdateSPWidget();
+	UpdatePose();
 }
 
 void UMyUserWidget::UpdateHPWidget()
@@ -40,6 +45,25 @@ void UMyUserWidget::UpdateSPWidget()
 		if (IsValid(SPProgressBar))
 		{
 			SPProgressBar->SetPercent(CurrentCharacterStat->GetSP() / 100.0f);
+		}
+	}
+}
+
+void UMyUserWidget::UpdatePose()
+{
+	if (IsValid(CurrentCharacterStat))
+	{
+		if (IsValid(Crosshair))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"));
+			if(CurrentCharacterStat->GetPose() == true)
+			{
+				Crosshair->SetVisibility(ESlateVisibility::Visible);
+			}
+			else
+			{
+				Crosshair->SetVisibility(ESlateVisibility::Hidden);
+			}
 		}
 	}
 }

@@ -8,6 +8,7 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnHPChangedDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnSPChangedDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnPoseChangedDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GIFTERS_API UGiftersStatComponent : public UActorComponent
@@ -30,6 +31,10 @@ public:
 	float GetHP();
 	float GetSP();
 
+	void ChangePose(bool bIsCombat);
+
+	bool GetPose();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -37,6 +42,7 @@ protected:
 public:
 	FOnHPChangedDelegate OnHPChanged;
 	FOnSPChangedDelegate OnSPChanged;
+	FOnPoseChangedDelegate OnPoseChanged;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = true))
@@ -44,4 +50,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = true))
 	float StaminaPoint;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = true))
+	bool bIsCombat;
 };

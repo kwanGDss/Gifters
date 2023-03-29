@@ -10,8 +10,10 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GiftersStatComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
+#include "Components/PrimitiveComponent.h"
 
 #define NEED_STAMINA_JUMP 20.0f
 #define NEED_STAMINA_RUN 10.0f
@@ -27,6 +29,7 @@
 AMyGiftersCharacter::AMyGiftersCharacter()
 {
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -97.0f), FRotator(0.0f, -90.0f, 0.0f));
+	GetMesh()->SetCollisionProfileName(TEXT("Character"));
 
 	GetFollowCamera()->SetRelativeLocationAndRotation(CHARACTER_CAMERA_POS, FRotator(0.0f, 0.0f, 0.0f));
 	GetCameraBoom()->TargetArmLength = 300.0f;
@@ -68,7 +71,12 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	if(P_MuzzleFlash.Succeeded())
 	{
 		MuzzleFire = P_MuzzleFlash.Object;
-		UE_LOG(LogTemp, Warning, TEXT("good "));
+	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> P_PrimaryHitWorld(TEXT("/Game/ParagonDrongo/FX/Particles/Abilities/Primary/FX/P_Drongo_Primary_Hit_World"));
+	if (P_PrimaryHitWorld.Succeeded())
+	{
+		PrimaryHitWorld= P_PrimaryHitWorld.Object;
 	}
 
 	CharacterStat = CreateDefaultSubobject<UGiftersStatComponent>(TEXT("CharacterStat"));
@@ -177,14 +185,29 @@ void AMyGiftersCharacter::Fire()
 	FVector StartedFire;
 	FVector EndedFire;
 	TArray<AActor*> IgnoreActors;
+	FRotator HitParticleRotator;
 
-	StartedFire = PistolStartPoint->GetComponentLocation();
+	StartedFire = GetFollowCamera()->GetComponentLocation();
 	EndedFire = StartedFire + GetFollowCamera()->GetForwardVector() * PISTOL_RANGE;
 	UGameplayStatics::SpawnEmitterAttached(MuzzleFire, PistolStartPoint);
 
-	GetWorld()->LineTraceSingleByProfile(HitResult, StartedFire, EndedFire, "Fire");
-	DrawDebugLine(GetWorld(), StartedFire, EndedFire, FColor::Red, false, 5.0f, 0, 5.0f);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Fire"));
+	GetWorld()->LineTraceSingleByChannel(HitResult, StartedFire, EndedFire, ECollisionChannel::ECC_GameTraceChannel1);
+	if(HitResult.GetActor() != nullptr)
+	{
+		HitParticleRotator = UKismetMathLibrary::FindLookAtRotation(HitResult.Location, StartedFire);
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), PrimaryHitWorld, HitResult.Location, HitParticleRotator);
+		if(HitResult.Component->Mobility == EComponentMobility::Movable)
+		{
+			HitResult.Component->AddImpulseAtLocation(-HitResult.ImpactNormal * 10000.0f, HitResult.Location);
+		}
+
+		DrawDebugLine(GetWorld(), PistolStartPoint->GetComponentLocation(), HitResult.Location, FColor::Red, false, 5.0f, 0, 5.0f);
+	}
+	else
+	{
+		FVector test = GetFollowCamera()->GetForwardVector() * PISTOL_RANGE;
+		DrawDebugLine(GetWorld(), PistolStartPoint->GetComponentLocation(), test, FColor::Red, false, 5.0f, 0, 5.0f);
+	}
 }
 
 void AMyGiftersCharacter::OnFireMontageStarted(UAnimMontage* AnimMontage)

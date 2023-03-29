@@ -109,4 +109,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Particle", meta = (AllowPrivateAccess = true))
 	class UParticleSystem* MuzzleFire;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Particle", meta = (AllowPrivateAccess = true))
+	UParticleSystem* PrimaryHitWorld;
 };
