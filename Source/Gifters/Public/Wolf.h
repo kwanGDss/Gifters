@@ -15,16 +15,18 @@ public:
 	// Sets default values for this character's properties
 	AWolf();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+private:
+	void UpdateHPWidget();
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Mesh", meta = (AllowPrivateAccess = true))
@@ -32,4 +34,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Mesh", meta = (AllowPrivateAccess = true))
 	USkeletalMeshComponent* Tail;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Stat", meta = (AllowPrivateAccess = true))
+	class UWidgetComponent* HPBarWidgetComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Stat", meta = (AllowPrivateAccess = true))
+	class UProgressBar* HPProgressBar;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Stat", meta = (AllowPrivateAccess = true))
+	float HealthPoint;
 };
