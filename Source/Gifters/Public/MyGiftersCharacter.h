@@ -24,12 +24,6 @@ public:
 	void Attack();
 
 	UFUNCTION(BlueprintCallable)
-	void ComboAttackSave();
-
-	UFUNCTION(BlueprintCallable)
-	void ResetCombo();
-
-	UFUNCTION(BlueprintCallable)
 	void Fire();
 
 	UFUNCTION(BlueprintCallable)
@@ -64,12 +58,6 @@ private:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	bool bIsAttacking;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
-	bool bSaveAttack;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
-	int AttackCount;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	UAnimMontage* FireMontage;

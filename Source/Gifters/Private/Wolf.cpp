@@ -47,7 +47,7 @@ void AWolf::BeginPlay()
 	Tail->SetMasterPoseComponent(GetMesh());
 
 	GetMesh()->SetCollisionProfileName(TEXT("Monster"));
-	GetMesh()->SetSimulatePhysics(true);
+	//GetMesh()->SetSimulatePhysics(true);
 
 	UE_LOG(LogTemp, Warning, TEXT("Monster"));
 }

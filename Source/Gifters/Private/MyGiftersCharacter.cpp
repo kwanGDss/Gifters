@@ -82,8 +82,6 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	CharacterStat = CreateDefaultSubobject<UGiftersStatComponent>(TEXT("CharacterStat"));
 
 	bIsAttacking = false;
-	bSaveAttack = false;
-	AttackCount = 0;
 	bPressedShift = false;
 	bIsRunning = false;
 	bRestoreStamina = true;
@@ -129,7 +127,7 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 	{
 		GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, AIM_DOWN_POS, DeltaTime, 10.0f));
 
-		if (FVector::Dist(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS + AIM_DOWN_POS) <= 0.1f)
+		if (FVector::Dist(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS + AIM_DOWN_POS) <= 0.5f)
 		{
 			bIsChangingPose = false;
 		}
@@ -138,7 +136,7 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 	{
 		GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, -AIM_DOWN_POS, DeltaTime, 10.0f));
 
-		if (FVector::Dist(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS) <= 0.1f)
+		if (FVector::Dist(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS) <= 0.5f)
 		{
 			bIsChangingPose = false;
 		}
@@ -147,36 +145,12 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 
 void AMyGiftersCharacter::Attack()
 {
-	if (bIsCombat)
+	if (bIsCombat && bIsAttacking == false)
 	{
-		if (bIsAttacking)
-		{
-			bSaveAttack = true;
-		}
-		else
-		{
-			bIsAttacking = true;
-
-			PlayAttackMontage();
-		}
-	}
-}
-
-void AMyGiftersCharacter::ComboAttackSave()
-{
-	if (bSaveAttack)
-	{
-		bSaveAttack = false;
+		bIsAttacking = true;
 
 		PlayAttackMontage();
 	}
-}
-
-void AMyGiftersCharacter::ResetCombo()
-{
-	AttackCount = 0;
-	bSaveAttack = false;
-	bIsAttacking = false;
 }
 
 void AMyGiftersCharacter::Fire()
@@ -208,6 +182,8 @@ void AMyGiftersCharacter::Fire()
 		FVector test = GetFollowCamera()->GetForwardVector() * PISTOL_RANGE;
 		DrawDebugLine(GetWorld(), PistolStartPoint->GetComponentLocation(), test, FColor::Red, false, 5.0f, 0, 5.0f);
 	}
+
+	bIsAttacking = false;
 }
 
 void AMyGiftersCharacter::OnFireMontageStarted(UAnimMontage* AnimMontage)
@@ -326,19 +302,7 @@ void AMyGiftersCharacter::MoveRight(float Value)
 
 void AMyGiftersCharacter::PlayAttackMontage()
 {
-	switch (AttackCount)
-	{
-	case 0:
-		AttackCount = 1;
-		PlayAnimMontage(FireMontage);
-		break;
-	case 1:
-		AttackCount = 0;
-		PlayAnimMontage(FireMontage);
-		break;
-	default:
-		break;
-	}
+	PlayAnimMontage(FireMontage);
 }
 
 //TEST
