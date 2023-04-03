@@ -72,6 +72,17 @@ void AWolf::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("Monster"));
 }
 
+float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	GetMesh()->SetSimulatePhysics(true);
+	HealthPoint -= Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	UpdateHPWidget();
+	UE_LOG(LogTemp, Warning, TEXT("TakeDamage()"));
+
+	return HealthPoint;
+}
+
 void AWolf::UpdateHPWidget()
 {
 	HPProgressBar->SetPercent(HealthPoint / 100.0f);
