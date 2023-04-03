@@ -176,12 +176,12 @@ void AMyGiftersCharacter::Fire()
 			HitResult.Component->AddImpulseAtLocation(-HitResult.ImpactNormal * 10000.0f, HitResult.Location);
 		}
 
-		DrawDebugLine(GetWorld(), PistolStartPoint->GetComponentLocation(), HitResult.Location, FColor::Red, false, 5.0f, 0, 5.0f);
+		//DrawDebugLine(GetWorld(), PistolStartPoint->GetComponentLocation(), HitResult.Location, FColor::Red, false, 5.0f, 0, 5.0f);
 	}
 	else
 	{
 		FVector test = GetFollowCamera()->GetForwardVector() * PISTOL_RANGE;
-		DrawDebugLine(GetWorld(), PistolStartPoint->GetComponentLocation(), test, FColor::Red, false, 5.0f, 0, 5.0f);
+		//DrawDebugLine(GetWorld(), PistolStartPoint->GetComponentLocation(), test, FColor::Red, false, 5.0f, 0, 5.0f);
 	}
 
 	bIsAttacking = false;

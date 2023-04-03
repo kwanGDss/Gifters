@@ -66,6 +66,18 @@ AWolf::AWolf()
 		GetMesh()->SetAnimInstanceClass(ABP_Wolf.Class);
 	}
 
+	static ConstructorHelpers::FObjectFinder<UMaterialInstance> MI_Wolf(TEXT("/Game/QuadrapedCreatures/Barghest/Materials/M_BARGHEST"));
+	if (MI_Wolf.Succeeded())
+	{
+		DefaultMaterial = MI_Wolf.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UMaterialInstance> MI_HitColorWolf(TEXT("/Game/QuadrapedCreatures/Barghest/Materials/M_BARGHEST_Inst"));
+	if (MI_HitColorWolf.Succeeded())
+	{
+		HitColorMaterial = MI_HitColorWolf.Object;
+	}
+
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 
 	HPBarWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
@@ -114,6 +126,8 @@ float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 		UE_LOG(LogTemp, Warning, TEXT("GetHit() : %f"), PlayAnimMontage(GetHitMontage));
 	}
 
+	ChangeDamageColor();
+
 	return HealthPoint;
 }
 
@@ -134,5 +148,17 @@ void AWolf::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AWolf::ChangeDamageColor()
+{
+	GetMesh()->SetMaterial(0, HitColorMaterial);
+
+	FTimerHandle WaitHandle;
+	float WaitTime = 0.2f;
+	GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
+		{
+			GetMesh()->SetMaterial(0, DefaultMaterial);
+		}), WaitTime, false);
 }
 
