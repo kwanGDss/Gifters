@@ -48,6 +48,26 @@ AWolf::AWolf()
 		HPBarWidgetComponent->SetWidgetClass(UI_HPBar.Class);
 	}
 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Wolf_GetHit(TEXT("/Game/QuadrapedCreatures/Barghest/Animations/AM_BARGHEST_GetHit"));
+	if (AM_Wolf_GetHit.Succeeded())
+	{
+		GetHitMontage = AM_Wolf_GetHit.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Wolf_Death(TEXT("/Game/QuadrapedCreatures/Barghest/Animations/AM_BARGHEST_Death"));
+	if (AM_Wolf_Death.Succeeded())
+	{
+		DeathMontage = AM_Wolf_Death.Object;
+	}
+
+	static ConstructorHelpers::FClassFinder<UAnimInstance> ABP_Wolf(TEXT("/Game/QuadrapedCreatures/Barghest/Blueprint/ABP_Wolf"));
+	if (ABP_Wolf.Succeeded())
+	{
+		GetMesh()->SetAnimInstanceClass(ABP_Wolf.Class);
+	}
+
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+
 	HPBarWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 	HPBarWidgetComponent->SetupAttachment(RootComponent);
 	HPBarWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 130.0f));
@@ -75,10 +95,24 @@ void AWolf::BeginPlay()
 float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
-	GetMesh()->SetSimulatePhysics(true);
-	HealthPoint -= Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	if (HealthPoint <= 0.0f)
+	{
+		return HealthPoint;
+	}
+
+	HealthPoint -= Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser); 
 	UpdateHPWidget();
-	UE_LOG(LogTemp, Warning, TEXT("TakeDamage()"));
+	if(HealthPoint <= 0.0f)
+	{
+		PlayAnimMontage(DeathMontage);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		UE_LOG(LogTemp, Warning, TEXT("Death() : %f"), PlayAnimMontage(DeathMontage));
+	}
+	else
+	{
+		PlayAnimMontage(GetHitMontage);
+		UE_LOG(LogTemp, Warning, TEXT("GetHit() : %f"), PlayAnimMontage(GetHitMontage));
+	}
 
 	return HealthPoint;
 }

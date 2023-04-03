@@ -45,4 +45,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Stat", meta = (AllowPrivateAccess = true))
 	float HealthPoint;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Anim", meta = (AllowPrivateAccess = true))
+	UAnimMontage* GetHitMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Anim", meta = (AllowPrivateAccess = true))
+	UAnimMontage* DeathMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
+	UAnimInstance* WolfAnimInstance;
 };
