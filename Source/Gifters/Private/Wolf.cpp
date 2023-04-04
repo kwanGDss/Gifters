@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/ProgressBar.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AWolf::AWolf()
@@ -85,6 +86,8 @@ AWolf::AWolf()
 	HPBarWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 130.0f));
 
 	HealthPoint = 100.0f;
+	BackHealthPoint = 100.0f;
+	bIsDamaged = false;
 }
 
 // Called when the game starts or when spawned
@@ -93,6 +96,7 @@ void AWolf::BeginPlay()
 	Super::BeginPlay();
 
 	HPProgressBar = Cast<UProgressBar>(HPBarWidgetComponent->GetUserWidgetObject()->GetWidgetFromName(TEXT("MonsterHPBar")));
+	BackHPProgressBar = Cast<UProgressBar>(HPBarWidgetComponent->GetUserWidgetObject()->GetWidgetFromName(TEXT("BackHPBar")));
 
 	UpdateHPWidget();
 	Mane->SetMasterPoseComponent(GetMesh());
@@ -112,12 +116,15 @@ float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 		return HealthPoint;
 	}
 
-	HealthPoint -= Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser); 
+	HealthPoint -= Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	bIsDamaged = true;
 	UpdateHPWidget();
 	if(HealthPoint <= 0.0f)
 	{
 		PlayAnimMontage(DeathMontage);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		HPBarWidgetComponent->DestroyComponent();
 		UE_LOG(LogTemp, Warning, TEXT("Death() : %f"), PlayAnimMontage(DeathMontage));
 	}
 	else
@@ -134,12 +141,24 @@ float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 void AWolf::UpdateHPWidget()
 {
 	HPProgressBar->SetPercent(HealthPoint / 100.0f);
+	BackHPProgressBar->SetPercent(BackHealthPoint / 100.0f);
 }
 
 // Called every frame
 void AWolf::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if(bIsDamaged==true)
+	{
+		BackHealthPoint = UKismetMathLibrary::FInterpTo(BackHealthPoint, HealthPoint, DeltaTime, 4.0f);
+		if(FMath::IsNearlyEqual(BackHealthPoint, HealthPoint, 0.01f))
+		{
+			bIsDamaged = false;
+		}
+
+		UpdateHPWidget();
+	}
 
 }
 
