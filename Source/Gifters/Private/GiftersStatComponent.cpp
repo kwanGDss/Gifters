@@ -72,6 +72,7 @@ float UGiftersStatComponent::GetSP()
 
 void UGiftersStatComponent::ChangePose(bool Pose)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Change Pose"));
 	bIsCombat = Pose;
 	OnPoseChanged.Broadcast();
 }

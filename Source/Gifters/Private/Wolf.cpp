@@ -151,7 +151,7 @@ void AWolf::Tick(float DeltaTime)
 
 	if(bIsDamaged==true)
 	{
-		BackHealthPoint = UKismetMathLibrary::FInterpTo(BackHealthPoint, HealthPoint, DeltaTime, 4.0f);
+		BackHealthPoint = UKismetMathLibrary::FInterpTo(BackHealthPoint, HealthPoint, DeltaTime, 3.0f);
 		if(FMath::IsNearlyEqual(BackHealthPoint, HealthPoint, 0.01f))
 		{
 			bIsDamaged = false;
@@ -159,6 +159,10 @@ void AWolf::Tick(float DeltaTime)
 
 		UpdateHPWidget();
 	}
+
+	FHitResult HitResult;
+
+	//ActorLineTraceSingle(HitResult, GetActorLocation(), GetWorld()->GetCurrentLevel()->)
 
 }
 

@@ -53,10 +53,8 @@ void UMyUserWidget::UpdatePose()
 {
 	if (IsValid(CurrentCharacterStat))
 	{
-		if (IsValid(Crosshair))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"));
-			if(CurrentCharacterStat->GetPose() == true)
+
+			if (CurrentCharacterStat->GetPose() == true)
 			{
 				Crosshair->SetVisibility(ESlateVisibility::Visible);
 			}
@@ -64,6 +62,6 @@ void UMyUserWidget::UpdatePose()
 			{
 				Crosshair->SetVisibility(ESlateVisibility::Hidden);
 			}
-		}
+		
 	}
 }

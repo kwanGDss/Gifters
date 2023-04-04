@@ -237,6 +237,7 @@ void AMyGiftersCharacter::ChangeCombatPose()
 	GetCameraBoom()->TargetArmLength = 70.0f;
 	//GetFollowCamera()->AddRelativeLocation(AIM_DOWN_POS);
 	GetCameraBoom()->bEnableCameraLag = false;
+	CharacterStat->ChangePose(true);
 	//GetFollowCamera()->MoveComponent()
 	//UKismetSystemLibrary::MoveComponentTo(GetFollowCamera(), FVector::ZeroVector, FRotator::ZeroRotator, true, true, 0.3f,);
 	//bIsChangingPose = true;
@@ -251,6 +252,7 @@ void AMyGiftersCharacter::ChangeNonCombatPose()
 	GetCameraBoom()->TargetArmLength = 300.0f;
 	//GetFollowCamera()->AddRelativeLocation(-AIM_DOWN_POS);
 	GetCameraBoom()->bEnableCameraLag = true;
+	CharacterStat->ChangePose(false);
 }
 
 void AMyGiftersCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
