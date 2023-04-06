@@ -165,12 +165,53 @@ void AWolf::Tick(float DeltaTime)
 
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *PlayerCharacter->GetFollowCamera()->GetComponentLocation().ToString());
 
-	FHitResult HitResult;
+	FHitResult MeshHitResult;
+	FHitResult HPBarHitResult;
+	TArray<AActor*> IgnoreActors;
+	IgnoreActors.Add(this);
 
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
 
-	GetWorld()->LineTraceSingleByChannel(HitResult, HPBarWidgetComponent->GetComponentLocation(), PlayerCharacter->GetFollowCamera()->GetComponentLocation(), ECollisionChannel::ECC_GameTraceChannel2);
+	UKismetSystemLibrary::LineTraceSingleForObjects(
+		GetWorld(),
+		GetMesh()->GetComponentLocation(),
+		PlayerCharacter->GetFollowCamera()->GetComponentLocation(),
+		ObjectTypes,
+		false,
+		IgnoreActors,
+		EDrawDebugTrace::None,
+		MeshHitResult,
+		true
+	);
 
-	if(HitResult.bBlockingHit)
+	UKismetSystemLibrary::LineTraceSingleForObjects(
+		GetWorld(),
+		HPBarWidgetComponent->GetComponentLocation(),
+		PlayerCharacter->GetFollowCamera()->GetComponentLocation(),
+		ObjectTypes,
+		false,
+		IgnoreActors,
+		EDrawDebugTrace::None,
+		HPBarHitResult,
+		true
+	);
+
+	if(MeshHitResult.bBlockingHit)
+	{
+		GetMesh()->SetRenderCustomDepth(true);
+		Mane->SetRenderCustomDepth(true);
+		Tail->SetRenderCustomDepth(true);
+	}
+	else
+	{
+		GetMesh()->SetRenderCustomDepth(false);
+		Mane->SetRenderCustomDepth(false);
+		Tail->SetRenderCustomDepth(false);
+	}
+
+	if (HPBarHitResult.bBlockingHit)
 	{
 		HPProgressBar->SetVisibility(ESlateVisibility::Hidden);
 		BackHPProgressBar->SetVisibility(ESlateVisibility::Hidden);
