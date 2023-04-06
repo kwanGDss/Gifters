@@ -58,7 +58,7 @@ private:
 	UAnimInstance* WolfAnimInstance;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material", meta = (AllowPrivateAccess = true))
-	UMaterialInstance* DefaultMaterial;
+	UMaterial* DefaultMaterial;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material", meta = (AllowPrivateAccess = true))
 	UMaterialInstance* HitColorMaterial;
@@ -71,4 +71,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Stat", meta = (AllowPrivateAccess = true))
 	UProgressBar* BackHPProgressBar;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Character", meta = (AllowPrivateAccess = true))
+	class AMyGiftersCharacter* PlayerCharacter;
 };

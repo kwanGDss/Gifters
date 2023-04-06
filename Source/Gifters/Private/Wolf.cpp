@@ -3,10 +3,13 @@
 
 #include "Wolf.h"
 
+#include "MyGiftersCharacter.h"
 #include "Blueprint/UserWidget.h"
+#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/ProgressBar.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -67,7 +70,7 @@ AWolf::AWolf()
 		GetMesh()->SetAnimInstanceClass(ABP_Wolf.Class);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UMaterialInstance> MI_Wolf(TEXT("/Game/QuadrapedCreatures/Barghest/Materials/M_BARGHEST"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> MI_Wolf(TEXT("/Game/QuadrapedCreatures/Barghest/Materials/M_BARGHEST"));
 	if (MI_Wolf.Succeeded())
 	{
 		DefaultMaterial = MI_Wolf.Object;
@@ -103,9 +106,9 @@ void AWolf::BeginPlay()
 	Tail->SetMasterPoseComponent(GetMesh());
 
 	GetMesh()->SetCollisionProfileName(TEXT("Monster"));
-	//GetMesh()->SetSimulatePhysics(true);
 
-	UE_LOG(LogTemp, Warning, TEXT("Monster"));
+	PlayerCharacter = Cast<AMyGiftersCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	//PlayerCharacter = Cast<APlayerCameraManager>UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
 }
 
 float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -160,7 +163,23 @@ void AWolf::Tick(float DeltaTime)
 		UpdateHPWidget();
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *PlayerCharacter->GetFollowCamera()->GetComponentLocation().ToString());
+
 	FHitResult HitResult;
+
+
+	GetWorld()->LineTraceSingleByChannel(HitResult, HPBarWidgetComponent->GetComponentLocation(), PlayerCharacter->GetFollowCamera()->GetComponentLocation(), ECollisionChannel::ECC_GameTraceChannel2);
+
+	if(HitResult.bBlockingHit)
+	{
+		HPProgressBar->SetVisibility(ESlateVisibility::Hidden);
+		BackHPProgressBar->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		HPProgressBar->SetVisibility(ESlateVisibility::Visible);
+		BackHPProgressBar->SetVisibility(ESlateVisibility::Visible);
+	}
 
 	//ActorLineTraceSingle(HitResult, GetActorLocation(), GetWorld()->GetCurrentLevel()->)
 
