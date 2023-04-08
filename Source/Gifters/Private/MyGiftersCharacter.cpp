@@ -127,7 +127,7 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 	{
 		GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, AIM_DOWN_POS, DeltaTime, 10.0f));
 
-		if (FVector::Dist(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS + AIM_DOWN_POS) <= 2.0f)
+		if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS + AIM_DOWN_POS) <= 5.0f)
 		{
 			bIsChangingPose = false;
 		}
@@ -136,7 +136,7 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 	{
 		GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, -AIM_DOWN_POS, DeltaTime, 10.0f));
 
-		if (FVector::Dist(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS) <= 2.0f)
+		if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS) <= 5.0f)
 		{
 			bIsChangingPose = false;
 		}
@@ -287,6 +287,9 @@ void AMyGiftersCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("BeginPlay"));
+	GetMesh()->SetRenderCustomDepth(true);
+	GetMesh()->SetCustomDepthStencilValue(1);
+	GetMesh()->SetCustomDepthStencilWriteMask(ERendererStencilMask::ERSM_255);
 }
 
 void AMyGiftersCharacter::MoveForward(float Value)
