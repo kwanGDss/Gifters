@@ -11,6 +11,7 @@
 #include "Components/ProgressBar.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "GiftersMonsterAIController.h"
 
 // Sets default values
 AWolf::AWolf()
@@ -81,6 +82,8 @@ AWolf::AWolf()
 	{
 		HitColorMaterial = MI_HitColorWolf.Object;
 	}
+
+	AIControllerClass = AGiftersMonsterAIController::StaticClass();
 
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 
@@ -162,8 +165,6 @@ void AWolf::Tick(float DeltaTime)
 
 		UpdateHPWidget();
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *PlayerCharacter->GetFollowCamera()->GetComponentLocation().ToString());
 
 	FHitResult MeshHitResult;
 	FHitResult HPBarHitResult;
