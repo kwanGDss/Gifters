@@ -87,6 +87,7 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	bRestoreStamina = true;
 	bIsCombat = false;
 	bIsChangingPose = false;
+	bIsDead = false;
 }
 
 void AMyGiftersCharacter::Tick(float DeltaTime)
@@ -140,6 +141,11 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 		{
 			bIsChangingPose = false;
 		}
+	}
+
+	if(CharacterStat->GetHP() <= 0.0f)
+	{
+		OnSelfDead();
 	}
 }
 
@@ -253,6 +259,12 @@ void AMyGiftersCharacter::ChangeNonCombatPose()
 	//GetFollowCamera()->AddRelativeLocation(-AIM_DOWN_POS);
 	GetCameraBoom()->bEnableCameraLag = true;
 	CharacterStat->ChangePose(false);
+}
+
+void AMyGiftersCharacter::OnSelfDead()
+{
+	bIsDead = true;
+	OnSelfDeadDelegate.Broadcast();
 }
 
 void AMyGiftersCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

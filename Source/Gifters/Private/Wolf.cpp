@@ -94,6 +94,18 @@ AWolf::AWolf()
 	HealthPoint = 100.0f;
 	BackHealthPoint = 100.0f;
 	bIsDamaged = false;
+	bIsDead = false;
+	DistanceToPlayer = 0.0f;
+}
+
+float AWolf::GetDistanceToPlayer()
+{
+	return DistanceToPlayer;
+}
+
+FVector AWolf::GetPlayerPosition()
+{
+	return PlayerCharacter->GetActorLocation();
 }
 
 // Called when the game starts or when spawned
@@ -111,7 +123,10 @@ void AWolf::BeginPlay()
 	GetMesh()->SetCollisionProfileName(TEXT("Monster"));
 
 	PlayerCharacter = Cast<AMyGiftersCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	//PlayerCharacter = Cast<APlayerCameraManager>UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+
+	PlayerCharacter->OnSelfDeadDelegate.AddDynamic(this, &AWolf::OnTargetDead);
+
+	DistanceToPlayer = GetDistanceTo(PlayerCharacter);
 }
 
 float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -127,7 +142,8 @@ float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 	UpdateHPWidget();
 	if(HealthPoint <= 0.0f)
 	{
-		PlayAnimMontage(DeathMontage);
+		//PlayAnimMontage(DeathMontage);
+		OnSelfDead();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		HPBarWidgetComponent->DestroyComponent();
@@ -223,8 +239,7 @@ void AWolf::Tick(float DeltaTime)
 		BackHPProgressBar->SetVisibility(ESlateVisibility::Visible);
 	}
 
-	//ActorLineTraceSingle(HitResult, GetActorLocation(), GetWorld()->GetCurrentLevel()->)
-
+	DistanceToPlayer = GetDistanceTo(PlayerCharacter);
 }
 
 // Called to bind functionality to input
@@ -246,3 +261,13 @@ void AWolf::ChangeDamageColor()
 		}), WaitTime, false);
 }
 
+void AWolf::OnTargetDead()
+{
+	OnTargetDeadDelegate.Broadcast();
+}
+
+void AWolf::OnSelfDead()
+{
+	bIsDead = true;
+	OnSelfDeadDelegate.Broadcast();
+}

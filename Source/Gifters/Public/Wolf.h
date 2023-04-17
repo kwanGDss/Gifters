@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "Wolf.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMonsterDelegate);
+
 UCLASS()
 class GIFTERS_API AWolf : public ACharacter
 {
@@ -22,6 +24,26 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void ChangeDamageColor();
+
+	UFUNCTION(BlueprintCallable, Category = "Wolf")
+	void OnTargetDead();
+
+	UFUNCTION(BlueprintCallable, Category = "Wolf")
+	void OnSelfDead();
+
+	// Event for target dead
+	UPROPERTY(BlueprintAssignable, Category = "Wolf")
+	FMonsterDelegate OnTargetDeadDelegate;
+
+	// Event for self dead
+	UPROPERTY(BlueprintAssignable, Category = "Wolf")
+	FMonsterDelegate OnSelfDeadDelegate;
+
+	UFUNCTION()
+	float GetDistanceToPlayer();
+
+	UFUNCTION()
+	FVector GetPlayerPosition();
 
 protected:
 	// Called when the game starts or when spawned
@@ -74,4 +96,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Character", meta = (AllowPrivateAccess = true))
 	class AMyGiftersCharacter* PlayerCharacter;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Stat", meta = (AllowPrivateAccess = true))
+	bool bIsDead;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AI", meta = (AllowPrivateAccess = true))
+	float DistanceToPlayer;
 };

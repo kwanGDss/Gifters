@@ -16,7 +16,29 @@ class GIFTERS_API AGiftersMonsterAIController : public AAIController
 
 public:
 	AGiftersMonsterAIController();
+
 	virtual void OnPossess(APawn* InPawn) override;
+
+	UFUNCTION()
+		void OnTargetDeadHandler();
+
+	UFUNCTION()
+		void OnSelfDeadHandler();
+
+	virtual void Tick(float DeltaSeconds) override;
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
+	FName IsTargetDeadKey;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
+	FName IsSelfDeadKey;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
+	FName DistanceKey;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
+	FName PlayerPositionKey;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
@@ -28,4 +50,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	class UBlackboardData* BlackboardAsset;
 
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	class AWolf* Wolf;
 };

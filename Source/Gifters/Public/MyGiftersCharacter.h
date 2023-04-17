@@ -7,6 +7,8 @@
 #include "GiftersCharacter.h"
 #include "MyGiftersCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerDeadDelegate);
+
 /**
  * 
  */
@@ -40,6 +42,12 @@ public:
 	void ChangeCombatPose();
 
 	void ChangeNonCombatPose();
+
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void OnSelfDead();
+
+	UPROPERTY(BlueprintAssignable, Category = "Wolf")
+	FPlayerDeadDelegate OnSelfDeadDelegate;
 
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -100,4 +108,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Particle", meta = (AllowPrivateAccess = true))
 	UParticleSystem* PrimaryHitWorld;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Stat", meta = (AllowPrivateAccess = true))
+	bool bIsDead;
 };
