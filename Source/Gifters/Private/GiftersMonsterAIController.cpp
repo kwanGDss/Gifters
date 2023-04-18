@@ -66,7 +66,8 @@ void AGiftersMonsterAIController::Tick(float DeltaSeconds)
 		UE_LOG(LogTemp, Warning, TEXT("Monster STOP!"));
 		Destroy();
 	}
-	UE_LOG(LogTemp, Warning, TEXT("%f"), FVector::Dist(Wolf->GetActorLocation(), Wolf->GetPlayerPosition()));
+	//UE_LOG(LogTemp, Warning, TEXT("%f"), FVector::Dist(Wolf->GetActorLocation(), Wolf->GetPlayerPosition()));
+	UE_LOG(LogTemp, Warning, TEXT("Wolf->GetPlayerPosition() : %s"), *Wolf->GetPlayerPosition().ToString());
 
 	BlackboardComponent->SetValueAsFloat(DistanceKey, FVector::Dist(Wolf->GetActorLocation(), Wolf->GetPlayerPosition()));
 	BlackboardComponent->SetValueAsVector(PlayerPositionKey, Wolf->GetPlayerPosition());
