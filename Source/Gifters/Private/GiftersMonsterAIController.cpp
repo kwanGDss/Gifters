@@ -60,14 +60,14 @@ void AGiftersMonsterAIController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (BlackboardComponent->GetValueAsBool(IsSelfDeadKey))
-	{
-		// Stop the BehaviorTree
-		UE_LOG(LogTemp, Warning, TEXT("Monster STOP!"));
-		Destroy();
-	}
+	//if (BlackboardComponent->GetValueAsBool(IsSelfDeadKey))
+	//{
+	//	// Stop the BehaviorTree
+	//	UE_LOG(LogTemp, Warning, TEXT("Monster STOP!"));
+	//	Destroy();
+	//}
 	//UE_LOG(LogTemp, Warning, TEXT("%f"), FVector::Dist(Wolf->GetActorLocation(), Wolf->GetPlayerPosition()));
-	UE_LOG(LogTemp, Warning, TEXT("Wolf->GetPlayerPosition() : %s"), *Wolf->GetPlayerPosition().ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("Wolf->GetPlayerPosition() : %s"), *Wolf->GetPlayerPosition().ToString());
 
 	BlackboardComponent->SetValueAsFloat(DistanceKey, FVector::Dist(Wolf->GetActorLocation(), Wolf->GetPlayerPosition()));
 	BlackboardComponent->SetValueAsVector(PlayerPositionKey, Wolf->GetPlayerPosition());

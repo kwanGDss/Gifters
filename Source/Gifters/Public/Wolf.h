@@ -23,6 +23,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void PostInitializeComponents() override;
+
 	void ChangeDamageColor();
 
 	UFUNCTION(BlueprintCallable, Category = "Wolf")
@@ -44,6 +46,9 @@ public:
 
 	UFUNCTION()
 	FVector GetPlayerPosition();
+
+	UFUNCTION(BlueprintCallable)
+	void OnDeadMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 protected:
 	// Called when the game starts or when spawned

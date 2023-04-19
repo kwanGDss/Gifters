@@ -12,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GiftersMonsterAIController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AWolf::AWolf()
@@ -91,6 +92,8 @@ AWolf::AWolf()
 	HPBarWidgetComponent->SetupAttachment(RootComponent);
 	HPBarWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 130.0f));
 
+	GetCharacterMovement()->MaxWalkSpeed = 250.0f;
+
 	HealthPoint = 100.0f;
 	BackHealthPoint = 100.0f;
 	bIsDamaged = false;
@@ -106,6 +109,15 @@ float AWolf::GetDistanceToPlayer()
 FVector AWolf::GetPlayerPosition()
 {
 	return PlayerCharacter->GetActorLocation();
+}
+
+void AWolf::OnDeadMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (Montage == DeathMontage)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DEADEADEAD"));
+		Destroy();
+	}
 }
 
 // Called when the game starts or when spawned
@@ -127,6 +139,9 @@ void AWolf::BeginPlay()
 	PlayerCharacter->OnSelfDeadDelegate.AddDynamic(this, &AWolf::OnTargetDead);
 
 	DistanceToPlayer = GetDistanceTo(PlayerCharacter);
+
+	WolfAnimInstance = Cast<UAnimInstance>(GetMesh()->GetAnimInstance());
+	WolfAnimInstance->OnMontageEnded.AddDynamic(this, &AWolf::OnDeadMontageEnded);
 }
 
 float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -140,19 +155,18 @@ float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 	HealthPoint -= Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	bIsDamaged = true;
 	UpdateHPWidget();
-	if(HealthPoint <= 0.0f)
+	if (HealthPoint <= 0.0f)
 	{
+		GetMesh()->GetAnimInstance()->Montage_Play(DeathMontage);
 		//PlayAnimMontage(DeathMontage);
 		OnSelfDead();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		HPBarWidgetComponent->DestroyComponent();
-		UE_LOG(LogTemp, Warning, TEXT("Death() : %f"), PlayAnimMontage(DeathMontage));
+		HPBarWidgetComponent->SetVisibility(false);
 	}
 	else
 	{
 		PlayAnimMontage(GetHitMontage);
-		UE_LOG(LogTemp, Warning, TEXT("GetHit() : %f"), PlayAnimMontage(GetHitMontage));
 	}
 
 	ChangeDamageColor();
@@ -171,10 +185,10 @@ void AWolf::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(bIsDamaged==true)
+	if (bIsDamaged == true)
 	{
 		BackHealthPoint = UKismetMathLibrary::FInterpTo(BackHealthPoint, HealthPoint, DeltaTime, 3.0f);
-		if(FMath::IsNearlyEqual(BackHealthPoint, HealthPoint, 0.01f))
+		if (FMath::IsNearlyEqual(BackHealthPoint, HealthPoint, 0.01f))
 		{
 			bIsDamaged = false;
 		}
@@ -215,7 +229,7 @@ void AWolf::Tick(float DeltaTime)
 		true
 	);
 
-	if(MeshHitResult.bBlockingHit)
+	if (MeshHitResult.bBlockingHit)
 	{
 		GetMesh()->SetRenderCustomDepth(true);
 		Mane->SetRenderCustomDepth(true);
@@ -240,12 +254,26 @@ void AWolf::Tick(float DeltaTime)
 	}
 
 	DistanceToPlayer = GetDistanceTo(PlayerCharacter);
+
+	if (WolfAnimInstance && WolfAnimInstance->Montage_IsPlaying(DeathMontage))
+	{
+		if(WolfAnimInstance->Montage_GetPosition(DeathMontage) >= DeathMontage->GetPlayLength())
+		{
+			Destroy();
+		}
+	}
 }
 
 // Called to bind functionality to input
 void AWolf::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+}
+
+void AWolf::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
 
 }
 
