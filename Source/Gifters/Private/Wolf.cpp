@@ -111,6 +111,11 @@ FVector AWolf::GetPlayerPosition()
 	return PlayerCharacter->GetActorLocation();
 }
 
+bool AWolf::GetGetHit()
+{
+	return bIsDamaged;
+}
+
 void AWolf::OnDeadMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	if (Montage == DeathMontage)
@@ -135,7 +140,6 @@ void AWolf::BeginPlay()
 	GetMesh()->SetCollisionProfileName(TEXT("Monster"));
 
 	PlayerCharacter = Cast<AMyGiftersCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-
 	PlayerCharacter->OnSelfDeadDelegate.AddDynamic(this, &AWolf::OnTargetDead);
 
 	DistanceToPlayer = GetDistanceTo(PlayerCharacter);
@@ -154,11 +158,12 @@ float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 
 	HealthPoint -= Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	bIsDamaged = true;
+	OnGetHit();
 	UpdateHPWidget();
 	if (HealthPoint <= 0.0f)
 	{
-		GetMesh()->GetAnimInstance()->Montage_Play(DeathMontage);
-		//PlayAnimMontage(DeathMontage);
+		//GetMesh()->GetAnimInstance()->Montage_Play(DeathMontage);
+		PlayAnimMontage(DeathMontage);
 		OnSelfDead();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -191,6 +196,7 @@ void AWolf::Tick(float DeltaTime)
 		if (FMath::IsNearlyEqual(BackHealthPoint, HealthPoint, 0.01f))
 		{
 			bIsDamaged = false;
+			OnGetHit();
 		}
 
 		UpdateHPWidget();
@@ -298,4 +304,9 @@ void AWolf::OnSelfDead()
 {
 	bIsDead = true;
 	OnSelfDeadDelegate.Broadcast();
+}
+
+void AWolf::OnGetHit()
+{
+	OnGetHitDelegate.Broadcast();
 }

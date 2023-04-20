@@ -33,6 +33,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Wolf")
 	void OnSelfDead();
 
+	UFUNCTION(BlueprintCallable, Category = "Wolf")
+	void OnGetHit();
+
 	// Event for target dead
 	UPROPERTY(BlueprintAssignable, Category = "Wolf")
 	FMonsterDelegate OnTargetDeadDelegate;
@@ -41,11 +44,17 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Wolf")
 	FMonsterDelegate OnSelfDeadDelegate;
 
+	UPROPERTY(BlueprintAssignable, Category = "Wolf")
+	FMonsterDelegate OnGetHitDelegate;
+
 	UFUNCTION()
 	float GetDistanceToPlayer();
 
 	UFUNCTION()
 	FVector GetPlayerPosition();
+
+	UFUNCTION()
+	bool GetGetHit();
 
 	UFUNCTION(BlueprintCallable)
 	void OnDeadMontageEnded(UAnimMontage* Montage, bool bInterrupted);

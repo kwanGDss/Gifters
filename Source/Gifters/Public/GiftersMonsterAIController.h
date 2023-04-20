@@ -20,10 +20,13 @@ public:
 	virtual void OnPossess(APawn* InPawn) override;
 
 	UFUNCTION()
-		void OnTargetDeadHandler();
+	void OnTargetDeadHandler();
 
 	UFUNCTION()
-		void OnSelfDeadHandler();
+	void OnSelfDeadHandler();
+
+	UFUNCTION()
+	void OnGetHitHandler();
 
 	virtual void Tick(float DeltaSeconds) override;
 
@@ -39,6 +42,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
 	FName PlayerPositionKey;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
+	FName GetHitKey;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
