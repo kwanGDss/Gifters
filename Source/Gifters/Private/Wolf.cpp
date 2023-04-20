@@ -163,7 +163,7 @@ float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 	if (HealthPoint <= 0.0f)
 	{
 		//GetMesh()->GetAnimInstance()->Montage_Play(DeathMontage);
-		PlayAnimMontage(DeathMontage);
+		//PlayAnimMontage(DeathMontage);
 		OnSelfDead();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -261,13 +261,13 @@ void AWolf::Tick(float DeltaTime)
 
 	DistanceToPlayer = GetDistanceTo(PlayerCharacter);
 
-	if (WolfAnimInstance && WolfAnimInstance->Montage_IsPlaying(DeathMontage))
-	{
-		if(WolfAnimInstance->Montage_GetPosition(DeathMontage) >= DeathMontage->GetPlayLength())
-		{
-			Destroy();
-		}
-	}
+	//if (WolfAnimInstance && WolfAnimInstance->Montage_IsPlaying(DeathMontage))
+	//{
+	//	if(WolfAnimInstance->Montage_GetPosition(DeathMontage) >= DeathMontage->GetPlayLength())
+	//	{
+	//		Destroy();
+	//	}
+	//}
 }
 
 // Called to bind functionality to input
