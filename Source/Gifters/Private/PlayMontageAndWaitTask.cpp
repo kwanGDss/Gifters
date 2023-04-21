@@ -41,7 +41,12 @@ EBTNodeResult::Type UPlayMontageAndWaitTask::ExecuteTask(UBehaviorTreeComponent&
 
 void UPlayMontageAndWaitTask::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult)
 {
-    MyOwnerComp = nullptr;
+    APawn* ControlledPawn = OwnerComp.GetAIOwner()->GetPawn();
+    if (ControlledPawn)
+    {
+        ControlledPawn->Destroy();
+    }
+    //MyOwnerComp = nullptr;
 }
 
 void UPlayMontageAndWaitTask::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)

@@ -165,9 +165,9 @@ float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 		//GetMesh()->GetAnimInstance()->Montage_Play(DeathMontage);
 		//PlayAnimMontage(DeathMontage);
 		OnSelfDead();
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		HPBarWidgetComponent->SetVisibility(false);
+		//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		//GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		//HPBarWidgetComponent->SetVisibility(false);
 	}
 	else
 	{
