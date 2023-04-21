@@ -39,20 +39,16 @@ EBTNodeResult::Type UPlayMontageAndWaitTask::ExecuteTask(UBehaviorTreeComponent&
     return EBTNodeResult::Failed;
 }
 
-void UPlayMontageAndWaitTask::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult)
-{
-    APawn* ControlledPawn = OwnerComp.GetAIOwner()->GetPawn();
-    if (ControlledPawn)
-    {
-        ControlledPawn->Destroy();
-    }
-    //MyOwnerComp = nullptr;
-}
-
 void UPlayMontageAndWaitTask::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
     if (MyOwnerComp)
     {
+        APawn* ControlledPawn = MyOwnerComp->GetAIOwner()->GetPawn();
+        if (ControlledPawn)
+        {
+            ControlledPawn->Destroy();
+        }
+
         MyOwnerComp->OnTaskFinished(this, bInterrupted ? EBTNodeResult::Aborted : EBTNodeResult::Succeeded);
     }
 }
