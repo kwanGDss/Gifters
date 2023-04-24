@@ -63,7 +63,7 @@ void AGiftersMonsterAIController::OnSelfDeadHandler()
 void AGiftersMonsterAIController::OnGetHitHandler()
 {
 	UE_LOG(LogTemp, Warning, TEXT("OnGetHitHandler"));
-	BlackboardComponent->SetValueAsBool(GetHitKey, Wolf->GetGetHit());
+	BlackboardComponent->SetValueAsBool(GetHitKey, true);
 }
 
 void AGiftersMonsterAIController::Tick(float DeltaSeconds)

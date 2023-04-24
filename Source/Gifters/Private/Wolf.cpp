@@ -171,7 +171,7 @@ float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 	}
 	else
 	{
-		PlayAnimMontage(GetHitMontage);
+		//PlayAnimMontage(GetHitMontage);
 	}
 
 	ChangeDamageColor();
@@ -196,7 +196,7 @@ void AWolf::Tick(float DeltaTime)
 		if (FMath::IsNearlyEqual(BackHealthPoint, HealthPoint, 0.01f))
 		{
 			bIsDamaged = false;
-			OnGetHit();
+			//OnGetHit();
 		}
 
 		UpdateHPWidget();
