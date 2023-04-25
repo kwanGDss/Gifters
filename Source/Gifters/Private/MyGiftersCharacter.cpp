@@ -61,10 +61,10 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 		GetMesh()->SetAnimInstanceClass(ABP_Drongo.Class);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Drongo(TEXT("/Game/ParagonDrongo/Characters/Heroes/Drongo/Animations/Primary_Fire_Montage"));
-	if (AM_Drongo.Succeeded())
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Drongo_Fire(TEXT("/Game/ParagonDrongo/Characters/Heroes/Drongo/Animations/Primary_Fire_Montage"));
+	if (AM_Drongo_Fire.Succeeded())
 	{
-		FireMontage = AM_Drongo.Object;
+		FireMontage = AM_Drongo_Fire.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> P_MuzzleFlash(TEXT("/Game/ParagonDrongo/FX/Particles/Abilities/Primary/FX/P_Drongo_Primary_MuzzleFlash"));
@@ -77,6 +77,12 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	if (P_PrimaryHitWorld.Succeeded())
 	{
 		PrimaryHitWorld= P_PrimaryHitWorld.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Drongo_Death(TEXT("/Game/ParagonDrongo/Characters/Heroes/Drongo/Animations/Drongo_Death"));
+	if (AM_Drongo_Death.Succeeded())
+	{
+		DeathMontage = AM_Drongo_Death.Object;
 	}
 
 	CharacterStat = CreateDefaultSubobject<UGiftersStatComponent>(TEXT("CharacterStat"));
@@ -141,11 +147,6 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 		{
 			bIsChangingPose = false;
 		}
-	}
-
-	if(CharacterStat->GetHP() <= 0.0f)
-	{
-		OnSelfDead();
 	}
 }
 
@@ -318,6 +319,24 @@ void AMyGiftersCharacter::MoveRight(float Value)
 	MoveRightValue = Value;
 }
 
+float AMyGiftersCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	CharacterStat->DecreaseHP(DamageAmount);
+
+	if (CharacterStat->GetHP() <= 0.0f)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Player Dead"));
+		OnSelfDead();
+		//GetMesh()->GetAnimInstance()->Montage_Play(DeathMontage);
+		//PlayAnimMontage(DeathMontage);
+
+		return DamageAmount;
+	}
+
+	return DamageAmount;
+}
+
 void AMyGiftersCharacter::PlayAttackMontage()
 {
 	PlayAnimMontage(FireMontage);
@@ -327,6 +346,11 @@ void AMyGiftersCharacter::PlayAttackMontage()
 void AMyGiftersCharacter::DamagedBySelf()
 {
 	UE_LOG(LogTemp, Warning, TEXT("DamagedBySelf"));
-	CharacterStat->DecreaseHP(10.0f);
+
+	FPointDamageEvent DamageEvent;
+	DamageEvent.DamageTypeClass = UDamageType::StaticClass();
+	DamageEvent.HitInfo.ImpactPoint = GetActorLocation();
+
+	TakeDamage(10.0f, DamageEvent, GetController(), this);
 }
 
