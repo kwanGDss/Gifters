@@ -162,18 +162,19 @@ float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 	UpdateHPWidget();
 	if (HealthPoint <= 0.0f)
 	{
-		//GetMesh()->GetAnimInstance()->Montage_Play(DeathMontage);
-		//PlayAnimMontage(DeathMontage);
+		WolfAnimInstance->Montage_Stop(1.0f);
+		PlayAnimMontage(DeathMontage);
 		OnSelfDead();
-		//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		//GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		//HPBarWidgetComponent->SetVisibility(false);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		HPBarWidgetComponent->SetVisibility(false);
+		//Destroy();
 	}
 	else
 	{
-		//PlayAnimMontage(GetHitMontage);
+		WolfAnimInstance->Montage_Stop(1.0f);
+		PlayAnimMontage(GetHitMontage);
 	}
-
 	ChangeDamageColor();
 
 	return HealthPoint;
@@ -255,19 +256,20 @@ void AWolf::Tick(float DeltaTime)
 	}
 	else
 	{
+
 		HPProgressBar->SetVisibility(ESlateVisibility::Visible);
 		BackHPProgressBar->SetVisibility(ESlateVisibility::Visible);
 	}
 
 	DistanceToPlayer = GetDistanceTo(PlayerCharacter);
 
-	//if (WolfAnimInstance && WolfAnimInstance->Montage_IsPlaying(DeathMontage))
-	//{
-	//	if(WolfAnimInstance->Montage_GetPosition(DeathMontage) >= DeathMontage->GetPlayLength())
-	//	{
-	//		Destroy();
-	//	}
-	//}
+	if (WolfAnimInstance && WolfAnimInstance->Montage_IsPlaying(DeathMontage))
+	{
+		if(WolfAnimInstance->Montage_GetPosition(DeathMontage) >= DeathMontage->GetPlayLength())
+		{
+			Destroy();
+		}
+	}
 }
 
 // Called to bind functionality to input

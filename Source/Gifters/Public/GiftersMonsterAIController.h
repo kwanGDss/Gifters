@@ -18,33 +18,24 @@ public:
 	AGiftersMonsterAIController();
 
 	virtual void OnPossess(APawn* InPawn) override;
-
-	UFUNCTION()
-	void OnTargetDeadHandler();
-
-	UFUNCTION()
-	void OnSelfDeadHandler();
-
-	UFUNCTION()
-	void OnGetHitHandler();
-
 	virtual void Tick(float DeltaSeconds) override;
 
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
-	FName IsTargetDeadKey;
+	//UFUNCTION()
+	//void OnTargetDeadHandler();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
-	FName IsSelfDeadKey;
+	//UFUNCTION()
+	//void OnSelfDeadHandler();
+
+	//UFUNCTION()
+	//void OnGetHitHandler();
+
+public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
 	FName DistanceKey;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
 	FName PlayerPositionKey;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
-	FName GetHitKey;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")

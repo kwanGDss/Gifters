@@ -2,9 +2,6 @@
 
 
 #include "GiftersMonsterAIController.h"
-
-#include <string>
-
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Wolf.h"
@@ -13,11 +10,8 @@ AGiftersMonsterAIController::AGiftersMonsterAIController()
 {
 	BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
 
-	IsTargetDeadKey = "IsTargetDead";
-	IsSelfDeadKey = "IsSelfDead";
 	DistanceKey = "Distance";
 	PlayerPositionKey = "PlayerPosition";
-	GetHitKey = "GetHit";
 }
 
 void AGiftersMonsterAIController::OnPossess(APawn* InPawn)
@@ -39,45 +33,36 @@ void AGiftersMonsterAIController::OnPossess(APawn* InPawn)
 
 	Wolf = Cast<AWolf>(InPawn);
 
-	if (Wolf)
-	{
-		// 몬스터 이벤트에 AIController 메서드 바인딩
-		Wolf->OnTargetDeadDelegate.AddDynamic(this, &AGiftersMonsterAIController::OnTargetDeadHandler);
-		Wolf->OnSelfDeadDelegate.AddDynamic(this, &AGiftersMonsterAIController::OnSelfDeadHandler);
-		Wolf->OnGetHitDelegate.AddDynamic(this, &AGiftersMonsterAIController::OnGetHitHandler);
-	}
+	//if (Wolf)
+	//{
+	//	// 몬스터 이벤트에 AIController 메서드 바인딩
+	//	Wolf->OnTargetDeadDelegate.AddDynamic(this, &AGiftersMonsterAIController::OnTargetDeadHandler);
+	//	Wolf->OnSelfDeadDelegate.AddDynamic(this, &AGiftersMonsterAIController::OnSelfDeadHandler);
+	//	Wolf->OnGetHitDelegate.AddDynamic(this, &AGiftersMonsterAIController::OnGetHitHandler);
+	//}
 }
 
-void AGiftersMonsterAIController::OnTargetDeadHandler()
-{
-	UE_LOG(LogTemp, Warning, TEXT("OnTargetDeadHandler"));
-	BlackboardComponent->SetValueAsBool(IsTargetDeadKey, true);
-}
-
-void AGiftersMonsterAIController::OnSelfDeadHandler()
-{
-	UE_LOG(LogTemp, Warning, TEXT("OnSelfDeadHandler"));
-	BlackboardComponent->SetValueAsBool(IsSelfDeadKey, true);
-}
-
-void AGiftersMonsterAIController::OnGetHitHandler()
-{
-	UE_LOG(LogTemp, Warning, TEXT("OnGetHitHandler"));
-	BlackboardComponent->SetValueAsBool(GetHitKey, true);
-}
+//void AGiftersMonsterAIController::OnTargetDeadHandler()
+//{
+//	UE_LOG(LogTemp, Warning, TEXT("OnTargetDeadHandler"));
+//	BlackboardComponent->SetValueAsBool(IsTargetDeadKey, true);
+//}
+//
+//void AGiftersMonsterAIController::OnSelfDeadHandler()
+//{
+//	UE_LOG(LogTemp, Warning, TEXT("OnSelfDeadHandler"));
+//	BlackboardComponent->SetValueAsBool(IsSelfDeadKey, true);
+//}
+//
+//void AGiftersMonsterAIController::OnGetHitHandler()
+//{
+//	UE_LOG(LogTemp, Warning, TEXT("OnGetHitHandler"));
+//	BlackboardComponent->SetValueAsBool(GetHitKey, true);
+//}
 
 void AGiftersMonsterAIController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	//if (BlackboardComponent->GetValueAsBool(IsSelfDeadKey))
-	//{
-	//	// Stop the BehaviorTree
-	//	UE_LOG(LogTemp, Warning, TEXT("Monster STOP!"));
-	//	Destroy();
-	//}
-	//UE_LOG(LogTemp, Warning, TEXT("%f"), FVector::Dist(Wolf->GetActorLocation(), Wolf->GetPlayerPosition()));
-	//UE_LOG(LogTemp, Warning, TEXT("Wolf->GetPlayerPosition() : %s"), *Wolf->GetPlayerPosition().ToString());
 
 	BlackboardComponent->SetValueAsFloat(DistanceKey, FVector::Dist(Wolf->GetActorLocation(), Wolf->GetPlayerPosition()));
 	BlackboardComponent->SetValueAsVector(PlayerPositionKey, Wolf->GetPlayerPosition());

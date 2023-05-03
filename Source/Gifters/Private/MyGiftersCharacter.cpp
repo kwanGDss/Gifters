@@ -100,6 +100,8 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	UE_LOG(LogTemp, Warning, TEXT("TEST"));
+
 	//Running
 	if (bIsRunning)
 	{
