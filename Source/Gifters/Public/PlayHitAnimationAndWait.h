@@ -6,24 +6,25 @@
 #include "BehaviorTree/BTTaskNode.h"
 #include "PlayHitAnimationAndWait.generated.h"
 
-/**
- *
- */
 UCLASS()
 class GIFTERS_API UPlayHitAnimationAndWait : public UBTTaskNode
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UPlayHitAnimationAndWait();
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
+        class UAnimMontage* HitMontage;
 
-	UPROPERTY(EditAnywhere, Category = "Animation")
-	UAnimMontage* HitAnimation;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Blackboard")
+        FBlackboardKeySelector IsMonsterHit;
+
+    virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+    virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
 protected:
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-	void OnAnimationFinished(UBehaviorTreeComponent* OwnerComp);
+    UBehaviorTreeComponent* OwningComp;
+    AAIController* AIController;
 
-private:
-	FTimerHandle TimerHandle;
+    void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 };

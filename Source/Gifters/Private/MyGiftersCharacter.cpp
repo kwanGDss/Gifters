@@ -88,6 +88,8 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	CharacterStat = CreateDefaultSubobject<UGiftersStatComponent>(TEXT("CharacterStat"));
 
 	bIsAttacking = false;
+	bSaveAttack = false;
+	AttackCount = 0;
 	bPressedShift = false;
 	bIsRunning = false;
 	bRestoreStamina = true;
@@ -100,7 +102,7 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UE_LOG(LogTemp, Warning, TEXT("TEST"));
+	//UE_LOG(LogTemp, Warning, TEXT("TEST"));
 
 	//Running
 	if (bIsRunning)
@@ -154,12 +156,39 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 
 void AMyGiftersCharacter::Attack()
 {
-	if (bIsCombat && bIsAttacking == false)
+	UE_LOG(LogTemp, Warning, TEXT("Attack()"));
+	if (bIsCombat)
 	{
-		bIsAttacking = true;
+		if (bIsAttacking)
+		{
+			bSaveAttack = true;
+		}
+		else
+		{
+			bIsAttacking = true;
+
+			PlayAttackMontage();
+		}
+	}
+}
+
+void AMyGiftersCharacter::ComboAttackSave()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ComboAttackSave()"));
+	if (bSaveAttack)
+	{
+		bSaveAttack = false;
 
 		PlayAttackMontage();
 	}
+}
+
+void AMyGiftersCharacter::ResetCombo()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ResetCombo()"));
+	AttackCount = 0;
+	bSaveAttack = false;
+	bIsAttacking = false;
 }
 
 void AMyGiftersCharacter::Fire()
@@ -192,13 +221,14 @@ void AMyGiftersCharacter::Fire()
 		FVector test = GetFollowCamera()->GetForwardVector() * PISTOL_RANGE;
 		//DrawDebugLine(GetWorld(), PistolStartPoint->GetComponentLocation(), test, FColor::Red, false, 5.0f, 0, 5.0f);
 	}
-
-	bIsAttacking = false;
 }
 
 void AMyGiftersCharacter::OnFireMontageStarted(UAnimMontage* AnimMontage)
 {
-
+	if (AnimMontage == FireMontage)
+	{
+		Fire();
+	}
 }
 
 UGiftersStatComponent* AMyGiftersCharacter::GetCharacterStat()
@@ -341,7 +371,19 @@ float AMyGiftersCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Da
 
 void AMyGiftersCharacter::PlayAttackMontage()
 {
-	PlayAnimMontage(FireMontage);
+	switch (AttackCount)
+	{
+	case 0:
+		AttackCount = 1;
+		PlayAnimMontage(FireMontage);
+		break;
+	case 1:
+		AttackCount = 0;
+		PlayAnimMontage(FireMontage);
+		break;
+	default:
+		break;
+	}
 }
 
 //TEST

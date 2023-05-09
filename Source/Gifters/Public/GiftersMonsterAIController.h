@@ -23,19 +23,31 @@ public:
 	//UFUNCTION()
 	//void OnTargetDeadHandler();
 
-	//UFUNCTION()
-	//void OnSelfDeadHandler();
+	UFUNCTION()
+	void OnMonsterDeadHandler();
 
-	//UFUNCTION()
-	//void OnGetHitHandler();
+	UFUNCTION()
+	void OnMonsterHitHandler();
 
 public:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
-	FName DistanceKey;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
+	//FName DistanceKey;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
 	FName PlayerPositionKey;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
+	FName IsPlayerInSightRangeKey;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
+	FName IsPlayerInAttackRangeKey;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
+	FName IsMonsterHitKey;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
+	FName IsMonsterDeadKey;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
@@ -49,4 +61,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	class AWolf* Wolf;
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Distance", meta = (AllowPrivateAccess = true))
+	float Distance;
 };

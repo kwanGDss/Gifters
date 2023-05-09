@@ -162,8 +162,8 @@ float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 	UpdateHPWidget();
 	if (HealthPoint <= 0.0f)
 	{
-		WolfAnimInstance->Montage_Stop(1.0f);
-		PlayAnimMontage(DeathMontage);
+		//WolfAnimInstance->Montage_Stop(1.0f);
+		//PlayAnimMontage(DeathMontage);
 		OnSelfDead();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -172,8 +172,8 @@ float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 	}
 	else
 	{
-		WolfAnimInstance->Montage_Stop(1.0f);
-		PlayAnimMontage(GetHitMontage);
+		//WolfAnimInstance->Montage_Stop(1.0f);
+		//PlayAnimMontage(GetHitMontage);
 	}
 	ChangeDamageColor();
 

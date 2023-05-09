@@ -1,50 +1,46 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "PlayHitAnimationAndWait.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
 #include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Animation/AnimInstance.h"
-#include "TimerManager.h"
-#include "GameFramework/Character.h"
-
-UPlayHitAnimationAndWait::UPlayHitAnimationAndWait()
-{
-    bNotifyTick = true;
-}
 
 EBTNodeResult::Type UPlayHitAnimationAndWait::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-    AAIController* AIController = OwnerComp.GetAIOwner();
-    ACharacter* Character = AIController ? Cast<ACharacter>(AIController->GetPawn()) : nullptr;
-    if (Character)
+    UE_LOG(LogTemp, Warning, TEXT("UPlayHitAnimationAndWait"));
+    OwningComp = &OwnerComp;
+    AIController = OwnerComp.GetAIOwner();
+
+    APawn* ControlledPawn = AIController->GetPawn();
+    UAnimInstance* AnimInstance = ControlledPawn->FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance();
+
+    if (AnimInstance && HitMontage)
     {
-        UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance();
-        if (AnimInstance && !AnimInstance->Montage_IsPlaying(HitAnimation))
-        {
-            AnimInstance->Montage_Play(HitAnimation);
-
-            FTimerDelegate TimerDel;
-            TimerDel.BindUObject(this, &UPlayHitAnimationAndWait::OnAnimationFinished, &OwnerComp);
-            GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, HitAnimation->GetPlayLength(), false);
-        }
-        else
-        {
-            AnimInstance->Montage_Stop(0.1f, HitAnimation);
-            AnimInstance->Montage_Play(HitAnimation);
-
-            FTimerDelegate TimerDel;
-            TimerDel.BindUObject(this, &UPlayHitAnimationAndWait::OnAnimationFinished, &OwnerComp);
-            GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, HitAnimation->GetPlayLength(), false);
-        }
+        AnimInstance->Montage_Play(HitMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+        FOnMontageEnded MontageEndedDelegate;
+        MontageEndedDelegate.BindUObject(this, &UPlayHitAnimationAndWait::OnMontageEnded);
+        AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, HitMontage);
+        return EBTNodeResult::InProgress;
     }
 
-    return EBTNodeResult::InProgress;
+    return EBTNodeResult::Failed;
 }
 
-void UPlayHitAnimationAndWait::OnAnimationFinished(UBehaviorTreeComponent* OwnerComp)
+void UPlayHitAnimationAndWait::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-    if (OwnerComp)
+    UBlackboardComponent* BlackboardComponent = OwnerComp.GetBlackboardComponent();
+    bool IsHit = BlackboardComponent->GetValueAsBool(IsMonsterHit.SelectedKeyName);
+
+    if (IsHit)
     {
-        FinishLatentTask(*OwnerComp, EBTNodeResult::Succeeded);
+        ExecuteTask(OwnerComp, NodeMemory);
+    }
+}
+
+void UPlayHitAnimationAndWait::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+    if (OwningComp && AIController)
+    {
+        OwningComp->GetBlackboardComponent()->SetValueAsBool(IsMonsterHit.SelectedKeyName, false);
+        FinishLatentTask(*OwningComp, EBTNodeResult::Succeeded);
     }
 }
