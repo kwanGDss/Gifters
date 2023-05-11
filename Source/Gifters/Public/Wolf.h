@@ -59,6 +59,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnDeadMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
+	UFUNCTION(BlueprintCallable)
+	void Bite();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -116,4 +119,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AI", meta = (AllowPrivateAccess = true))
 	float DistanceToPlayer;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Anim", meta = (AllowPrivateAccess = true))
+	UAnimMontage* BiteMontage;
 };

@@ -84,6 +84,12 @@ AWolf::AWolf()
 		HitColorMaterial = MI_HitColorWolf.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Wolf_Bite(TEXT("/Game/QuadrapedCreatures/Barghest/Animations/AM_BARGHEST_BiteNormal"));
+	if (AM_Wolf_Bite.Succeeded())
+	{
+		BiteMontage = AM_Wolf_Bite.Object;
+	}
+
 	AIControllerClass = AGiftersMonsterAIController::StaticClass();
 
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
@@ -125,6 +131,12 @@ void AWolf::OnDeadMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	}
 }
 
+void AWolf::Bite()
+{
+	UE_LOG(LogTemp, Warning, TEXT("BITE"));
+	//Destroy();
+}
+
 // Called when the game starts or when spawned
 void AWolf::BeginPlay()
 {
@@ -146,6 +158,7 @@ void AWolf::BeginPlay()
 
 	WolfAnimInstance = Cast<UAnimInstance>(GetMesh()->GetAnimInstance());
 	WolfAnimInstance->OnMontageEnded.AddDynamic(this, &AWolf::OnDeadMontageEnded);
+	//WolfAnimInstance->OnMontageStarted.AddDynamic(this, &AWolf::Bite);
 }
 
 float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -173,7 +186,7 @@ float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 	else
 	{
 		//WolfAnimInstance->Montage_Stop(1.0f);
-		//PlayAnimMontage(GetHitMontage);
+		PlayAnimMontage(BiteMontage);
 	}
 	ChangeDamageColor();
 
@@ -265,7 +278,7 @@ void AWolf::Tick(float DeltaTime)
 
 	if (WolfAnimInstance && WolfAnimInstance->Montage_IsPlaying(DeathMontage))
 	{
-		if(WolfAnimInstance->Montage_GetPosition(DeathMontage) >= DeathMontage->GetPlayLength())
+		if (WolfAnimInstance->Montage_GetPosition(DeathMontage) >= DeathMontage->GetPlayLength())
 		{
 			Destroy();
 		}

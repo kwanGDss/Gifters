@@ -13,10 +13,10 @@ class GIFTERS_API UPlayHitAnimationAndWait : public UBTTaskNode
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
-        class UAnimMontage* HitMontage;
+	class UAnimMontage* HitMontage;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Blackboard")
-        FBlackboardKeySelector IsMonsterHit;
+	FBlackboardKeySelector IsMonsterHit;
 
     virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
