@@ -134,7 +134,7 @@ void AWolf::OnDeadMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 void AWolf::Bite()
 {
 	UE_LOG(LogTemp, Warning, TEXT("BITE"));
-	//Destroy();
+	UGameplayStatics::ApplyDamage(PlayerCharacter, 10.0f, GetController(), this, NULL);
 }
 
 // Called when the game starts or when spawned
