@@ -149,7 +149,9 @@ void AWolf::BeginPlay()
 	Mane->SetMasterPoseComponent(GetMesh());
 	Tail->SetMasterPoseComponent(GetMesh());
 
-	GetMesh()->SetCollisionProfileName(TEXT("Monster"));
+	GetMesh()->SetCollisionObjectType(ECC_Pawn);
+	Mane->SetCollisionObjectType(ECC_Pawn);
+	Tail->SetCollisionObjectType(ECC_Pawn);
 
 	PlayerCharacter = Cast<AMyGiftersCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	PlayerCharacter->OnSelfDeadDelegate.AddDynamic(this, &AWolf::OnTargetDead);

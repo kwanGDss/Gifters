@@ -199,12 +199,32 @@ void AMyGiftersCharacter::Fire()
 	FVector EndedFire;
 	TArray<AActor*> IgnoreActors;
 	FRotator HitParticleRotator;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+
+	IgnoreActors.Add(this);
+
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_PhysicsBody));
 
 	StartedFire = GetFollowCamera()->GetComponentLocation();
 	EndedFire = StartedFire + GetFollowCamera()->GetForwardVector() * PISTOL_RANGE;
 	UGameplayStatics::SpawnEmitterAttached(MuzzleFire, PistolStartPoint);
 
-	GetWorld()->LineTraceSingleByChannel(HitResult, StartedFire, EndedFire, ECollisionChannel::ECC_GameTraceChannel1);
+	//GetWorld()->LineTraceSingleByChannel(HitResult, StartedFire, EndedFire, ECollisionChannel::ECC_GameTraceChannel1);
+
+	UKismetSystemLibrary::LineTraceSingleForObjects(
+		GetWorld(),
+		StartedFire,
+		EndedFire,
+		ObjectTypes,
+		false,
+		IgnoreActors,
+		EDrawDebugTrace::None,
+		HitResult,
+		true
+	);
+
 	if(HitResult.GetActor() != nullptr)
 	{
 		HitParticleRotator = UKismetMathLibrary::FindLookAtRotation(HitResult.Location, StartedFire);
