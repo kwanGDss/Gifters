@@ -102,54 +102,55 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//UE_LOG(LogTemp, Warning, TEXT("TEST"));
-
-	//Running
-	if (bIsRunning)
+	if (!bIsDead)
 	{
-		CharacterStat->DecreaseSP(NEED_STAMINA_RUN * DeltaTime);
-		bRestoreStamina = false;
-	}
-	else
-	{
-		bRestoreStamina = true;
-	}
-
-	if (GetCharacterStat()->GetSP() <= KINDA_SMALL_NUMBER)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = 500.0f;
-		bIsRunning = false;
-		bRestoreStamina = true;
-	}
-
-	if (GetCharacterMovement()->IsFalling())
-	{
-		bRestoreStamina = false;
-	}
-
-	//Restore Stamina
-	if (bRestoreStamina)
-	{
-		CharacterStat->IncreaseSP(RESTORE_STAMINA * DeltaTime);
-	}
-
-	//Camera movement due to pose change
-	if (bIsChangingPose == true && bIsCombat == true)
-	{
-		GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, AIM_DOWN_POS, DeltaTime, 10.0f));
-
-		if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS + AIM_DOWN_POS) <= 5.0f)
+		//Running
+		if (bIsRunning)
 		{
-			bIsChangingPose = false;
+			CharacterStat->DecreaseSP(NEED_STAMINA_RUN * DeltaTime);
+			bRestoreStamina = false;
 		}
-	}
-	else if (bIsChangingPose == true && bIsCombat == false)
-	{
-		GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, -AIM_DOWN_POS, DeltaTime, 10.0f));
-
-		if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS) <= 5.0f)
+		else
 		{
-			bIsChangingPose = false;
+			bRestoreStamina = true;
+		}
+
+		if (GetCharacterStat()->GetSP() <= KINDA_SMALL_NUMBER)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = 500.0f;
+			bIsRunning = false;
+			bRestoreStamina = true;
+		}
+
+		if (GetCharacterMovement()->IsFalling())
+		{
+			bRestoreStamina = false;
+		}
+
+		//Restore Stamina
+		if (bRestoreStamina)
+		{
+			CharacterStat->IncreaseSP(RESTORE_STAMINA * DeltaTime);
+		}
+
+		//Camera movement due to pose change
+		if (bIsChangingPose == true && bIsCombat == true)
+		{
+			GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, AIM_DOWN_POS, DeltaTime, 10.0f));
+
+			if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS + AIM_DOWN_POS) <= 5.0f)
+			{
+				bIsChangingPose = false;
+			}
+		}
+		else if (bIsChangingPose == true && bIsCombat == false)
+		{
+			GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, -AIM_DOWN_POS, DeltaTime, 10.0f));
+
+			if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS) <= 5.0f)
+			{
+				bIsChangingPose = false;
+			}
 		}
 	}
 }
@@ -157,7 +158,7 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 void AMyGiftersCharacter::Attack()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Attack()"));
-	if (bIsCombat)
+	if (bIsCombat && !bIsDead)
 	{
 		if (bIsAttacking)
 		{
@@ -243,55 +244,70 @@ UGiftersStatComponent* AMyGiftersCharacter::GetCharacterStat()
 
 void AMyGiftersCharacter::Run()
 {
-	bPressedShift = true;
-
-	if (CharacterStat->GetSP() >= KINDA_SMALL_NUMBER)
+	if (!bIsDead)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 750.f;
-		bIsRunning = true;
+		bPressedShift = true;
+
+		if (CharacterStat->GetSP() >= KINDA_SMALL_NUMBER)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = 750.f;
+			bIsRunning = true;
+		}
 	}
 }
 
 void AMyGiftersCharacter::Walk()
 {
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
-	bPressedShift = false;
-	bIsRunning = false;
+	if (!bIsDead)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 500.f;
+		bPressedShift = false;
+		bIsRunning = false;
+	}
 }
 
 void AMyGiftersCharacter::Jump()
 {
-	if (CharacterStat->GetSP() > NEED_STAMINA_JUMP)
+	if (!bIsDead)
 	{
-		Super::Jump();
-		CharacterStat->DecreaseSP(NEED_STAMINA_JUMP);
+		if (CharacterStat->GetSP() > NEED_STAMINA_JUMP)
+		{
+			Super::Jump();
+			CharacterStat->DecreaseSP(NEED_STAMINA_JUMP);
+		}
 	}
 }
 
 void AMyGiftersCharacter::ChangeCombatPose()
 {
-	bIsCombat = true;
-	bIsChangingPose = true;
+	if (!bIsDead)
+	{
+		bIsCombat = true;
+		bIsChangingPose = true;
 
-	GetCameraBoom()->TargetArmLength = 70.0f;
-	//GetFollowCamera()->AddRelativeLocation(AIM_DOWN_POS);
-	GetCameraBoom()->bEnableCameraLag = false;
-	CharacterStat->ChangePose(true);
-	//GetFollowCamera()->MoveComponent()
-	//UKismetSystemLibrary::MoveComponentTo(GetFollowCamera(), FVector::ZeroVector, FRotator::ZeroRotator, true, true, 0.3f,);
-	//bIsChangingPose = true;
-	//GetFollowCamera()->SetRelativeLocation(FMath::VInterpTo(GetFollowCamera()->GetRelativeLocation(), GetFollowCamera()->GetRelativeLocation() + FVector(0.0f, COMBAT_POSE_CAMERA_DISTANCE, 0.0f), GetWorld()->GetDeltaSeconds(), 5.0f));
+		GetCameraBoom()->TargetArmLength = 70.0f;
+		//GetFollowCamera()->AddRelativeLocation(AIM_DOWN_POS);
+		GetCameraBoom()->bEnableCameraLag = false;
+		CharacterStat->ChangePose(true);
+		//GetFollowCamera()->MoveComponent()
+		//UKismetSystemLibrary::MoveComponentTo(GetFollowCamera(), FVector::ZeroVector, FRotator::ZeroRotator, true, true, 0.3f,);
+		//bIsChangingPose = true;
+		//GetFollowCamera()->SetRelativeLocation(FMath::VInterpTo(GetFollowCamera()->GetRelativeLocation(), GetFollowCamera()->GetRelativeLocation() + FVector(0.0f, COMBAT_POSE_CAMERA_DISTANCE, 0.0f), GetWorld()->GetDeltaSeconds(), 5.0f));
+	}
 }
 
 void AMyGiftersCharacter::ChangeNonCombatPose()
 {
-	bIsCombat = false;
-	bIsChangingPose = true;
+	if (!bIsDead)
+	{
+		bIsCombat = false;
+		bIsChangingPose = true;
 
-	GetCameraBoom()->TargetArmLength = 300.0f;
-	//GetFollowCamera()->AddRelativeLocation(-AIM_DOWN_POS);
-	GetCameraBoom()->bEnableCameraLag = true;
-	CharacterStat->ChangePose(false);
+		GetCameraBoom()->TargetArmLength = 300.0f;
+		//GetFollowCamera()->AddRelativeLocation(-AIM_DOWN_POS);
+		GetCameraBoom()->bEnableCameraLag = true;
+		CharacterStat->ChangePose(false);
+	}
 }
 
 void AMyGiftersCharacter::OnSelfDead()
@@ -339,16 +355,22 @@ void AMyGiftersCharacter::BeginPlay()
 
 void AMyGiftersCharacter::MoveForward(float Value)
 {
-	Super::MoveForward(Value);
+	if (!bIsDead)
+	{
+		Super::MoveForward(Value);
 
-	MoveForwardValue = Value;
+		MoveForwardValue = Value;
+	}
 }
 
 void AMyGiftersCharacter::MoveRight(float Value)
 {
-	Super::MoveRight(Value);
+	if (!bIsDead)
+	{
+		Super::MoveRight(Value);
 
-	MoveRightValue = Value;
+		MoveRightValue = Value;
+	}
 }
 
 float AMyGiftersCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -361,7 +383,10 @@ float AMyGiftersCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Da
 		UE_LOG(LogTemp, Warning, TEXT("Player Dead"));
 		OnSelfDead();
 		//GetMesh()->GetAnimInstance()->Montage_Play(DeathMontage);
-		//PlayAnimMontage(DeathMontage);
+		if(!GetMesh()->GetAnimInstance()->Montage_IsPlaying(DeathMontage))
+		{
+			PlayAnimMontage(DeathMontage);
+		}
 
 		return DamageAmount;
 	}
