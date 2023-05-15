@@ -138,7 +138,7 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 		{
 			GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, AIM_DOWN_POS, DeltaTime, 10.0f));
 
-			if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS + AIM_DOWN_POS) <= 5.0f)
+			if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS + AIM_DOWN_POS) <= 10.0f)
 			{
 				bIsChangingPose = false;
 			}
@@ -147,7 +147,7 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 		{
 			GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, -AIM_DOWN_POS, DeltaTime, 10.0f));
 
-			if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS) <= 5.0f)
+			if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS) <= 10.0f)
 			{
 				bIsChangingPose = false;
 			}
@@ -229,9 +229,12 @@ void AMyGiftersCharacter::Fire()
 	{
 		HitParticleRotator = UKismetMathLibrary::FindLookAtRotation(HitResult.Location, StartedFire);
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), PrimaryHitWorld, HitResult.Location, HitParticleRotator);
-		if(HitResult.Component->Mobility == EComponentMobility::Movable)
+		if (HitResult.GetComponent()->GetCollisionObjectType() == ECC_Pawn)
 		{
 			UGameplayStatics::ApplyDamage(HitResult.GetActor(), 10.0f, GetController(), this, NULL);
+		}
+		else if(HitResult.Component->Mobility == EComponentMobility::Movable)
+		{
 			HitResult.Component->AddImpulseAtLocation(-HitResult.ImpactNormal * 10000.0f, HitResult.Location);
 		}
 

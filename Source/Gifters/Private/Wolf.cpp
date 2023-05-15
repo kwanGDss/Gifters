@@ -187,8 +187,9 @@ float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 	}
 	else
 	{
+		UE_LOG(LogTemp, Warning, TEXT("GetHit..."));
 		//WolfAnimInstance->Montage_Stop(1.0f);
-		PlayAnimMontage(BiteMontage);
+		//PlayAnimMontage(BiteMontage);
 	}
 	ChangeDamageColor();
 
