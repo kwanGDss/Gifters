@@ -142,6 +142,7 @@ void AWolf::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp, Warning, TEXT("Monster BeginPlay"));
 	HPProgressBar = Cast<UProgressBar>(HPBarWidgetComponent->GetUserWidgetObject()->GetWidgetFromName(TEXT("MonsterHPBar")));
 	BackHPProgressBar = Cast<UProgressBar>(HPBarWidgetComponent->GetUserWidgetObject()->GetWidgetFromName(TEXT("BackHPBar")));
 
