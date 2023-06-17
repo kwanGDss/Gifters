@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "GiftersGameMode.h"
+#include "EngineUtils.h"
+#include "GiftersMonsterAIController.h"
 #include "MyGiftersCharacter.h"
 #include "MyPlayerController.h"
 #include "SpawnPoint.h"
@@ -36,7 +38,18 @@ void AGiftersGameMode::SpawnMonster()
         ASpawnPoint* SpawnPoint = SpawnPoints[RandomIndex];
 
         // 선택한 ASpawnPoint에서 몬스터 스폰
-    	GetWorld()->SpawnActor<AWolf>(AWolf::StaticClass(), SpawnPoint->GetActorLocation(), SpawnPoint->GetActorRotation());
+        AWolf* SpawnedWolf = GetWorld()->SpawnActor<AWolf>(AWolf::StaticClass(), SpawnPoint->GetActorLocation(), SpawnPoint->GetActorRotation());
 
+        if (SpawnedWolf)
+        {
+            AGiftersMonsterAIController* AIController = GetWorld()->SpawnActor<AGiftersMonsterAIController>(AGiftersMonsterAIController::StaticClass());
+
+            if (AIController)
+            {
+                AIController->Possess(SpawnedWolf);
+            }
+        }
+
+        UE_LOG(LogTemp, Warning, TEXT("Spawn Succeed!"))
     }
 }

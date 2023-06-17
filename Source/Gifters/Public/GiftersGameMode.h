@@ -15,7 +15,7 @@ class AGiftersGameMode : public AGameModeBase
 public:
 	AGiftersGameMode();
 
-	void AGiftersGameMode::SpawnMonster();
+	void SpawnMonster();
 
 	//virtual void Tick(float DeltaTime) override; // 게임 틱에 대한 오버라이딩
 
@@ -23,5 +23,6 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	TArray<ASpawnPoint*> SpawnPoints;
+	FTimerHandle SpawnTimerHandle;
+	TArray<class ASpawnPoint*> SpawnPoints;
 };
