@@ -14,6 +14,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
 #include "Components/PrimitiveComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Engine/TextureRenderTarget2D.h"
 
 #define NEED_STAMINA_JUMP 20.0f
 #define NEED_STAMINA_RUN 10.0f
@@ -42,6 +44,12 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	PistolStartPoint = CreateDefaultSubobject<USceneComponent>(TEXT("PistolStartPoint"));
 	PistolStartPoint->SetupAttachment(GetMesh(), TEXT("pistol_cylinder"));
 	PistolStartPoint->SetRelativeLocationAndRotation(FVector(0.0f, 20.0f, 0.0f), FRotator(0.0f, 90.0f, 0.0f));
+
+	MinimapCamera = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("MinimapCamera"));
+	MinimapCamera->SetupAttachment(RootComponent);
+	MinimapCamera->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 720.0f), FRotator(-90.0f, 360.0f, 0.0f));
+	MinimapCamera->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
+	MinimapCamera->bCaptureEveryFrame = true;
 
 	//AimingCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("AimingCameraBoom"));
 	//AimingCameraBoom->SetupAttachment(RootComponent);
@@ -85,7 +93,14 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 		DeathMontage = AM_Drongo_Death.Object;
 	}
 
+	//static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> RT_Minimap(TEXT("/Game/ParagonDrongo/Characters/Heroes/Drongo/Animations/Drongo_Death"));
+	//if (RT_Minimap.Succeeded())
+	//{
+	//	MinimapRenderTarget2D = RT_Minimap.Object;
+	//}
+
 	CharacterStat = CreateDefaultSubobject<UGiftersStatComponent>(TEXT("CharacterStat"));
+	MinimapCamera->TextureTarget = MinimapRenderTarget2D;
 
 	bIsAttacking = false;
 	bSaveAttack = false;

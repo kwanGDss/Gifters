@@ -128,4 +128,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
 	UAnimMontage* DeathMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MiniMap", meta = (AllowPrivateAccess = true))
+	USceneCaptureComponent2D* MinimapCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MiniMap", meta = (AllowPrivateAccess = true))
+	UTextureRenderTarget2D* MinimapRenderTarget2D;
 };

@@ -24,6 +24,8 @@ protected:
 	void UpdateSPWidget();
 	void UpdatePose();
 
+	void BrushRenderTarget(UTextureRenderTarget2D* RenderTarget);
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = true))
 	class UGiftersStatComponent* CurrentCharacterStat;
@@ -36,4 +38,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowPrivateAccess = true))
 	class UImage* Crosshair;
+	
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowPrivateAccess = true))
+	//UImage* Minimap;
 };

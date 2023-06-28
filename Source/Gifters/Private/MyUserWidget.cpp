@@ -21,6 +21,7 @@ void UMyUserWidget::NativeConstruct()
 	HPProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HealthBar")));
 	SPProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("StaminaBar")));
 	Crosshair = Cast<UImage>(GetWidgetFromName(TEXT("Crosshairs")));
+	//Minimap = Cast<UImage>(GetWidgetFromName(TEXT("Minimap")));
 
 	UpdateHPWidget();
 	UpdateSPWidget();
@@ -64,4 +65,9 @@ void UMyUserWidget::UpdatePose()
 			}
 		
 	}
+}
+
+void UMyUserWidget::BrushRenderTarget(UTextureRenderTarget2D* RenderTarget)
+{
+
 }
