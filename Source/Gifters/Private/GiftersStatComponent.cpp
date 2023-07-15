@@ -2,6 +2,7 @@
 
 
 #include "GiftersStatComponent.h"
+#include "Engine/TextureRenderTarget2D.h"
 
 // Sets default values for this component's properties
 UGiftersStatComponent::UGiftersStatComponent()
@@ -80,4 +81,14 @@ void UGiftersStatComponent::ChangePose(bool Pose)
 bool UGiftersStatComponent::GetPose()
 {
 	return bIsCombat;
+}
+
+void UGiftersStatComponent::RegisterRenderTarget(UTextureRenderTarget2D* InMiniMapRenderTarget)
+{
+	MiniMapRenderTarget = InMiniMapRenderTarget;
+}
+
+UTextureRenderTarget2D* UGiftersStatComponent::GetRenderTarget()
+{
+	return MiniMapRenderTarget;
 }

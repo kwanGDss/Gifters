@@ -5,6 +5,7 @@
 #include "GiftersStatComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/Image.h"
+#include "Engine/TextureRenderTarget2D.h"
 
 void UMyUserWidget::BindCharacterStat(UGiftersStatComponent* NewCharacterStat)
 {
@@ -21,11 +22,18 @@ void UMyUserWidget::NativeConstruct()
 	HPProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HealthBar")));
 	SPProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("StaminaBar")));
 	Crosshair = Cast<UImage>(GetWidgetFromName(TEXT("Crosshairs")));
-	//Minimap = Cast<UImage>(GetWidgetFromName(TEXT("Minimap")));
+	MiniMap = Cast<UImage>(GetWidgetFromName(TEXT("Minimaps")));
 
 	UpdateHPWidget();
 	UpdateSPWidget();
 	UpdatePose();
+}
+
+void UMyUserWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	BrushRenderTarget();
 }
 
 void UMyUserWidget::UpdateHPWidget()
@@ -54,7 +62,7 @@ void UMyUserWidget::UpdatePose()
 {
 	if (IsValid(CurrentCharacterStat))
 	{
-
+		UE_LOG(LogTemp, Warning, TEXT("UpdatePose()"));
 			if (CurrentCharacterStat->GetPose() == true)
 			{
 				Crosshair->SetVisibility(ESlateVisibility::Visible);
@@ -67,7 +75,14 @@ void UMyUserWidget::UpdatePose()
 	}
 }
 
-void UMyUserWidget::BrushRenderTarget(UTextureRenderTarget2D* RenderTarget)
+void UMyUserWidget::BrushRenderTarget()
 {
+	FSlateBrush Brush;
+	if (IsValid(CurrentCharacterStat))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BrushRenderTarget()"));
+		Brush.SetResourceObject(CurrentCharacterStat->GetRenderTarget());
 
+		MiniMap->SetBrush(Brush);
+	}
 }

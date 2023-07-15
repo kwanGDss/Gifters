@@ -130,8 +130,14 @@ private:
 	UAnimMontage* DeathMontage;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MiniMap", meta = (AllowPrivateAccess = true))
-	USceneCaptureComponent2D* MinimapCamera;
+	UCameraComponent* MiniMapCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MiniMap", meta = (AllowPrivateAccess = true))
-	UTextureRenderTarget2D* MinimapRenderTarget2D;
+	UTextureRenderTarget2D* MiniMapRenderTarget;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MiniMap", meta = (AllowPrivateAccess = true))
+	USceneCaptureComponent2D* SceneCapture;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MiniMap", meta = (AllowPrivateAccess = true))
+	UMaterial* MiniMapMaterial;
 };

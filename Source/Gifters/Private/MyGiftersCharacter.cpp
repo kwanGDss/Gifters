@@ -15,6 +15,7 @@
 #include "Particles/ParticleSystem.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "Engine/CanvasRenderTarget2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 
 #define NEED_STAMINA_JUMP 20.0f
@@ -45,17 +46,15 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	PistolStartPoint->SetupAttachment(GetMesh(), TEXT("pistol_cylinder"));
 	PistolStartPoint->SetRelativeLocationAndRotation(FVector(0.0f, 20.0f, 0.0f), FRotator(0.0f, 90.0f, 0.0f));
 
-	MinimapCamera = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("MinimapCamera"));
-	MinimapCamera->SetupAttachment(RootComponent);
-	MinimapCamera->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 720.0f), FRotator(-90.0f, 360.0f, 0.0f));
-	MinimapCamera->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
-	MinimapCamera->bCaptureEveryFrame = true;
+	MiniMapCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("MiniMapCamera"));
+	MiniMapCamera->SetupAttachment(RootComponent);
+	MiniMapCamera->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 720.0f), FRotator(-90.0f, 360.0f, 0.0f));
 
-	//AimingCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("AimingCameraBoom"));
-	//AimingCameraBoom->SetupAttachment(RootComponent);
-	//AimingCameraBoom->bUsePawnControlRotation = true;
-	//AimingCameraBoom->SocketOffset = FVector(0.0f, 200.0f, 0.0f);
-	//AimingCameraBoom->TargetArmLength = 150.0f;
+	AimingCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("AimingCameraBoom"));
+	AimingCameraBoom->SetupAttachment(RootComponent);
+	AimingCameraBoom->bUsePawnControlRotation = true;
+	AimingCameraBoom->SocketOffset = FVector(0.0f, 200.0f, 0.0f);
+	AimingCameraBoom->TargetArmLength = 150.0f;
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Drongo(TEXT("/Game/ParagonDrongo/Characters/Heroes/Drongo/Meshes/Drongo_GDC"));
 	if (SK_Drongo.Succeeded())
@@ -66,6 +65,7 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ABP_Drongo(TEXT("/Game/ParagonDrongo/Characters/Heroes/Drongo/Drongo_AnimBlueprint"));
 	if (ABP_Drongo.Succeeded())
 	{
+
 		GetMesh()->SetAnimInstanceClass(ABP_Drongo.Class);
 	}
 
@@ -93,14 +93,21 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 		DeathMontage = AM_Drongo_Death.Object;
 	}
 
-	//static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> RT_Minimap(TEXT("/Game/ParagonDrongo/Characters/Heroes/Drongo/Animations/Drongo_Death"));
-	//if (RT_Minimap.Succeeded())
+	//static ConstructorHelpers::FObjectFinder<UMaterial> M_MiniMap(TEXT("/Game/Assets/MiniMap_Mat"));
+	//if (M_MiniMap.Succeeded())
 	//{
-	//	MinimapRenderTarget2D = RT_Minimap.Object;
+	//	MiniMapMaterial = M_MiniMap.Object;
 	//}
 
+	MiniMapRenderTarget = NewObject<UTextureRenderTarget2D>(this, TEXT("MiniMapRenderTarget"));
+	MiniMapRenderTarget->InitCustomFormat(512, 512, EPixelFormat::PF_B8G8R8A8, true);
+
+	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
+	SceneCapture->SetupAttachment(MiniMapCamera);
+	SceneCapture->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
+	SceneCapture->TextureTarget = MiniMapRenderTarget;
+
 	CharacterStat = CreateDefaultSubobject<UGiftersStatComponent>(TEXT("CharacterStat"));
-	MinimapCamera->TextureTarget = MinimapRenderTarget2D;
 
 	bIsAttacking = false;
 	bSaveAttack = false;
@@ -168,6 +175,8 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 			}
 		}
 	}
+
+	CharacterStat->RegisterRenderTarget(MiniMapRenderTarget);
 }
 
 void AMyGiftersCharacter::Attack()

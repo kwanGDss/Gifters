@@ -35,6 +35,10 @@ public:
 
 	bool GetPose();
 
+	void RegisterRenderTarget(UTextureRenderTarget2D* InMiniMapRenderTarget);
+
+	UTextureRenderTarget2D* GetRenderTarget();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -53,4 +57,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = true))
 	bool bIsCombat;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = true))
+	UTextureRenderTarget2D* MiniMapRenderTarget;
 };
