@@ -62,7 +62,6 @@ void UMyUserWidget::UpdatePose()
 {
 	if (IsValid(CurrentCharacterStat))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UpdatePose()"));
 			if (CurrentCharacterStat->GetPose() == true)
 			{
 				Crosshair->SetVisibility(ESlateVisibility::Visible);
@@ -80,8 +79,11 @@ void UMyUserWidget::BrushRenderTarget()
 	FSlateBrush Brush;
 	if (IsValid(CurrentCharacterStat))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("BrushRenderTarget()"));
 		Brush.SetResourceObject(CurrentCharacterStat->GetRenderTarget());
+		Brush.DrawAs = ESlateBrushDrawType::RoundedBox;
+		Brush.OutlineSettings.Width = 5.0f;
+		Brush.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
+		Brush.OutlineSettings.Color = FLinearColor::Black;
 
 		MiniMap->SetBrush(Brush);
 	}

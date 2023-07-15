@@ -48,7 +48,11 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 
 	MiniMapCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("MiniMapCamera"));
 	MiniMapCamera->SetupAttachment(RootComponent);
-	MiniMapCamera->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 720.0f), FRotator(-90.0f, 360.0f, 0.0f));
+	MiniMapCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 720.0f));
+	MiniMapCamera->SetWorldRotation(FRotator(-90.0f, 360.0f, 0.0f));
+	MiniMapCamera->SetProjectionMode(ECameraProjectionMode::Orthographic);
+	MiniMapCamera->SetOrthoWidth(1024.0f);
+	MiniMapCamera->bUsePawnControlRotation = false;
 
 	AimingCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("AimingCameraBoom"));
 	AimingCameraBoom->SetupAttachment(RootComponent);
@@ -176,7 +180,14 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 		}
 	}
 
-	CharacterStat->RegisterRenderTarget(MiniMapRenderTarget);
+	//CharacterStat->RegisterRenderTarget(MiniMapRenderTarget);
+
+	if (MiniMapCamera)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *MiniMapCamera->GetComponentRotation().ToString());
+		MiniMapCamera->SetWorldRotation(FRotator(-90.0f, 360.0f, 0.0f));
+		CharacterStat->RegisterRenderTarget(MiniMapRenderTarget);
+	}
 }
 
 void AMyGiftersCharacter::Attack()
