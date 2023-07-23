@@ -14,6 +14,7 @@ UGiftersStatComponent::UGiftersStatComponent()
 	HealthPoint = 100.0f;
 	StaminaPoint = 100.0f;
 	bIsCombat = false;
+	KillMonsterCount = 0;
 }
 
 // Called when the game starts
@@ -91,4 +92,14 @@ void UGiftersStatComponent::RegisterRenderTarget(UTextureRenderTarget2D* InMiniM
 UTextureRenderTarget2D* UGiftersStatComponent::GetRenderTarget()
 {
 	return MiniMapRenderTarget;
+}
+
+void UGiftersStatComponent::IncreaseKillMonsterCount(int Count)
+{
+	KillMonsterCount += Count;
+}
+
+int UGiftersStatComponent::GetKillMonsterCount() const
+{
+	return KillMonsterCount;
 }

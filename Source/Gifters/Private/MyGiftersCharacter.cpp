@@ -184,7 +184,6 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 
 	if (MiniMapCamera)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *MiniMapCamera->GetComponentRotation().ToString());
 		MiniMapCamera->SetWorldRotation(FRotator(-90.0f, 360.0f, 0.0f));
 		CharacterStat->RegisterRenderTarget(MiniMapRenderTarget);
 	}

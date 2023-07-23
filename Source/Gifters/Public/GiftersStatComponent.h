@@ -39,6 +39,9 @@ public:
 
 	UTextureRenderTarget2D* GetRenderTarget();
 
+	void IncreaseKillMonsterCount(int Count);
+	int GetKillMonsterCount() const;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -60,4 +63,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = true))
 	UTextureRenderTarget2D* MiniMapRenderTarget;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = true))
+	int KillMonsterCount;
 };

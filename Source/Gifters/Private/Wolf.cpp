@@ -12,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GiftersMonsterAIController.h"
+#include "GiftersStatComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -184,6 +185,7 @@ float AWolf::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		HPBarWidgetComponent->SetVisibility(false);
+		PlayerCharacter->GetCharacterStat()->IncreaseKillMonsterCount(1);
 		//Destroy();
 	}
 	else
