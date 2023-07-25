@@ -433,6 +433,11 @@ void AMyGiftersCharacter::MoveRight(float Value)
 float AMyGiftersCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
+	if(bIsDead)
+	{
+		return 0.0f;
+	}
+
 	CharacterStat->DecreaseHP(DamageAmount);
 
 	if (CharacterStat->GetHP() <= 0.0f)

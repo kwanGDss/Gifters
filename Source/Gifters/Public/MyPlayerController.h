@@ -22,8 +22,19 @@ public:
 
 	void FloatPlayerHUD();
 
+	UFUNCTION()
+	void FloatGameOverHUD();
+
+	UFUNCTION()
+	void FloatPauseHUD();
+
+	UFUNCTION()
+	void TogglePause();
+
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void SetupInputComponent() override;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = true))
@@ -33,5 +44,17 @@ private:
 	TSubclassOf<UUserWidget> PlayerHUDClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowPrivateAccess = true))
+	TSubclassOf<UUserWidget> GameOverHUDClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowPrivateAccess = true))
+	TSubclassOf<UUserWidget> PauseHUDClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowPrivateAccess = true))
 	class UMyUserWidget* PlayerHUD;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowPrivateAccess = true))
+	class UGameOverWidget* GameOverHUD;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowPrivateAccess = true))
+	class UPauseWidget* PauseHUD;
 };
