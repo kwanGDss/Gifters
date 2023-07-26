@@ -60,7 +60,6 @@ void AMyPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("PauseGame", IE_Pressed, this, &AMyPlayerController::TogglePause);
-	InputComponent->BindAction("TestInput", IE_Pressed, this, &AMyPlayerController::TestInputFunction);
 }
 
 void AMyPlayerController::FloatPlayerHUD()
