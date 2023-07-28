@@ -17,6 +17,10 @@ class GIFTERS_API UGameOverWidget : public UUserWidget
 public:
 	UFUNCTION()
 	void OnRestartButtonClicked();
+
+	UFUNCTION()
+	void OnExitButtonClicked();
+
 	void BindCharacterStat(class UGiftersStatComponent* NewCharacterStat);
 
 protected:

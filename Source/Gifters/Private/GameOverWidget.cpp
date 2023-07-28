@@ -15,6 +15,12 @@ void UGameOverWidget::NativeConstruct()
     {
         RestartButton->OnClicked.AddDynamic(this, &UGameOverWidget::OnRestartButtonClicked);
     }
+
+    UButton* ExitButton = Cast<UButton>(GetWidgetFromName(TEXT("ExitButton")));
+    if (ExitButton)
+    {
+        ExitButton->OnClicked.AddDynamic(this, &UGameOverWidget::OnExitButtonClicked);
+    }
 }
 
 void UGameOverWidget::OnRestartButtonClicked()
@@ -24,6 +30,11 @@ void UGameOverWidget::OnRestartButtonClicked()
 
     // open the current level (i.e., restart the level)
     UGameplayStatics::OpenLevel(this, FName(*currentLevelName));
+}
+
+void UGameOverWidget::OnExitButtonClicked()
+{
+    FGenericPlatformMisc::RequestExit(false);
 }
 
 void UGameOverWidget::BindCharacterStat(UGiftersStatComponent* NewCharacterStat)

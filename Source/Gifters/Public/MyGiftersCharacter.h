@@ -140,4 +140,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MiniMap", meta = (AllowPrivateAccess = true))
 	UMaterial* MiniMapMaterial;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
+	UAnimMontage* GetHitAnimMontage;
 };

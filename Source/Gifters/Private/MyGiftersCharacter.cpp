@@ -97,6 +97,12 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 		DeathMontage = AM_Drongo_Death.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Drongo_GetHit(TEXT("/Game/ParagonDrongo/Characters/Heroes/Drongo/Animations/GetHit_Montage"));
+	if (AM_Drongo_GetHit.Succeeded())
+	{
+		GetHitAnimMontage = AM_Drongo_GetHit.Object;
+	}
+
 	//static ConstructorHelpers::FObjectFinder<UMaterial> M_MiniMap(TEXT("/Game/Assets/MiniMap_Mat"));
 	//if (M_MiniMap.Succeeded())
 	//{
@@ -404,7 +410,6 @@ void AMyGiftersCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("BeginPlay"));
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->SetCustomDepthStencilValue(1);
 	GetMesh()->SetCustomDepthStencilWriteMask(ERendererStencilMask::ERSM_255);
@@ -452,6 +457,8 @@ float AMyGiftersCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Da
 
 		return DamageAmount;
 	}
+
+	PlayAnimMontage(GetHitAnimMontage);
 
 	return DamageAmount;
 }
