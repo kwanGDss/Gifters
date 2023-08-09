@@ -26,7 +26,7 @@
 #define MAX_HEALTH_POINT 100.0f
 #define COMBAT_POSE_CAMERA_DISTANCE 100.0f
 #define PISTOL_RANGE 50000.0f;
-#define AIM_DOWN_POS FVector(0.0f, 50.0f, 30.0f)
+#define AIM_DOWN_POS FVector(0.0f, 70.0f, 30.0f)
 #define CHARACTER_CAMERA_POS FVector(0.0f, 0.0f, 50.0f)
 
 AMyGiftersCharacter::AMyGiftersCharacter()
@@ -168,7 +168,8 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 		//Camera movement due to pose change
 		if (bIsChangingPose == true && bIsCombat == true)
 		{
-			GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, AIM_DOWN_POS, DeltaTime, 10.0f));
+			FVector NewCameraLocation = FMath::VInterpTo(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS + AIM_DOWN_POS, DeltaTime, 10.0f);
+			GetFollowCamera()->SetRelativeLocation(NewCameraLocation);
 
 			if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS + AIM_DOWN_POS) <= 10.0f)
 			{
@@ -177,13 +178,33 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 		}
 		else if (bIsChangingPose == true && bIsCombat == false)
 		{
-			GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, -AIM_DOWN_POS, DeltaTime, 10.0f));
+			FVector NewCameraLocation = FMath::VInterpTo(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS, DeltaTime, 10.0f);
+			GetFollowCamera()->SetRelativeLocation(NewCameraLocation);
 
 			if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS) <= 10.0f)
 			{
 				bIsChangingPose = false;
 			}
 		}
+
+		//if (bIsChangingPose == true && bIsCombat == true)
+		//{
+		//	GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, AIM_DOWN_POS, DeltaTime, 10.0f));
+
+		//	if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS + AIM_DOWN_POS) <= 10.0f)
+		//	{
+		//		bIsChangingPose = false;
+		//	}
+		//}
+		//else if (bIsChangingPose == true && bIsCombat == false)
+		//{
+		//	GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, -AIM_DOWN_POS, DeltaTime, 10.0f));
+
+		//	if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS) <= 10.0f)
+		//	{
+		//		bIsChangingPose = false;
+		//	}
+		//}
 	}
 
 	//CharacterStat->RegisterRenderTarget(MiniMapRenderTarget);
