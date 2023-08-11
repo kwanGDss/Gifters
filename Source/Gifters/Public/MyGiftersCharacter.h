@@ -49,6 +49,10 @@ public:
 
 	void ChangeNonCombatPose();
 
+	void ThrowGrenade();
+
+	void RefillGrenade() const;
+
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	void OnSelfDead();
 
@@ -143,4 +147,15 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
 	UAnimMontage* GetHitAnimMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
+	UAnimMontage* ThrowGrenadeMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Attack", meta = (AllowPrivateAccess = true))
+	TSubclassOf<class AGrenade> GrenadeClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Attack", meta = (AllowPrivateAccess = true))
+	float ThrowPower;
+
+	FTimerHandle GrenadeRefillTimerHandle;
 };

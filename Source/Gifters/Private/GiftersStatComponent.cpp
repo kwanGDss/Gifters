@@ -15,6 +15,7 @@ UGiftersStatComponent::UGiftersStatComponent()
 	StaminaPoint = 100.0f;
 	bIsCombat = false;
 	KillMonsterCount = 0;
+	GrenadeCount = 3;
 }
 
 // Called when the game starts
@@ -102,4 +103,24 @@ void UGiftersStatComponent::IncreaseKillMonsterCount(int Count)
 int UGiftersStatComponent::GetKillMonsterCount() const
 {
 	return KillMonsterCount;
+}
+
+int UGiftersStatComponent::GetGrenadeCount()
+{
+	return GrenadeCount;
+}
+
+void UGiftersStatComponent::SetGrenadeCount(int Count)
+{
+	GrenadeCount = Count;
+}
+
+void UGiftersStatComponent::IncreaseGrenadeCount()
+{
+	GrenadeCount++;
+}
+
+void UGiftersStatComponent::DecreaseGrenadeCount()
+{
+	GrenadeCount--;
 }

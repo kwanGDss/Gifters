@@ -10,6 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GiftersStatComponent.h"
+#include "Grenade.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
@@ -17,6 +18,7 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "Engine/CanvasRenderTarget2D.h"
 #include "Engine/TextureRenderTarget2D.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 #define NEED_STAMINA_JUMP 20.0f
 #define NEED_STAMINA_RUN 10.0f
@@ -80,7 +82,7 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	}
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> P_MuzzleFlash(TEXT("/Game/ParagonDrongo/FX/Particles/Abilities/Primary/FX/P_Drongo_Primary_MuzzleFlash"));
-	if(P_MuzzleFlash.Succeeded())
+	if (P_MuzzleFlash.Succeeded())
 	{
 		MuzzleFire = P_MuzzleFlash.Object;
 	}
@@ -88,7 +90,7 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> P_PrimaryHitWorld(TEXT("/Game/ParagonDrongo/FX/Particles/Abilities/Primary/FX/P_Drongo_Primary_Hit_World"));
 	if (P_PrimaryHitWorld.Succeeded())
 	{
-		PrimaryHitWorld= P_PrimaryHitWorld.Object;
+		PrimaryHitWorld = P_PrimaryHitWorld.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Drongo_Death(TEXT("/Game/ParagonDrongo/Characters/Heroes/Drongo/Animations/Drongo_Death"));
@@ -101,6 +103,12 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	if (AM_Drongo_GetHit.Succeeded())
 	{
 		GetHitAnimMontage = AM_Drongo_GetHit.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Drongo_ThrowGrenade(TEXT("/Game/ParagonDrongo/Characters/Heroes/Drongo/Animations/ThrowGrenade_Montage"));
+	if (AM_Drongo_ThrowGrenade.Succeeded())
+	{
+		ThrowGrenadeMontage = AM_Drongo_ThrowGrenade.Object;
 	}
 
 	//static ConstructorHelpers::FObjectFinder<UMaterial> M_MiniMap(TEXT("/Game/Assets/MiniMap_Mat"));
@@ -128,6 +136,8 @@ AMyGiftersCharacter::AMyGiftersCharacter()
 	bIsCombat = false;
 	bIsChangingPose = false;
 	bIsDead = false;
+	GrenadeClass = AGrenade::StaticClass();
+	ThrowPower = 1000.0f;
 }
 
 void AMyGiftersCharacter::Tick(float DeltaTime)
@@ -186,28 +196,7 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 				bIsChangingPose = false;
 			}
 		}
-
-		//if (bIsChangingPose == true && bIsCombat == true)
-		//{
-		//	GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, AIM_DOWN_POS, DeltaTime, 10.0f));
-
-		//	if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS + AIM_DOWN_POS) <= 10.0f)
-		//	{
-		//		bIsChangingPose = false;
-		//	}
-		//}
-		//else if (bIsChangingPose == true && bIsCombat == false)
-		//{
-		//	GetFollowCamera()->AddRelativeLocation(FMath::VInterpTo(FVector::ZeroVector, -AIM_DOWN_POS, DeltaTime, 10.0f));
-
-		//	if (FVector::DistSquared(GetFollowCamera()->GetRelativeLocation(), CHARACTER_CAMERA_POS) <= 10.0f)
-		//	{
-		//		bIsChangingPose = false;
-		//	}
-		//}
 	}
-
-	//CharacterStat->RegisterRenderTarget(MiniMapRenderTarget);
 
 	if (MiniMapCamera)
 	{
@@ -286,15 +275,15 @@ void AMyGiftersCharacter::Fire()
 		true
 	);
 
-	if(HitResult.GetActor() != nullptr)
+	if (HitResult.GetActor() != nullptr)
 	{
 		HitParticleRotator = UKismetMathLibrary::FindLookAtRotation(HitResult.Location, StartedFire);
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), PrimaryHitWorld, HitResult.Location, HitParticleRotator);
 		if (HitResult.GetComponent()->GetCollisionObjectType() == ECC_Pawn)
 		{
-			UGameplayStatics::ApplyDamage(HitResult.GetActor(), 10.0f, GetController(), this, NULL);
+			UGameplayStatics::ApplyDamage(HitResult.GetActor(), 20.0f, GetController(), this, NULL);
 		}
-		else if(HitResult.Component->Mobility == EComponentMobility::Movable)
+		else if (HitResult.Component->Mobility == EComponentMobility::Movable)
 		{
 			HitResult.Component->AddImpulseAtLocation(-HitResult.ImpactNormal * 10000.0f, HitResult.Location);
 		}
@@ -394,6 +383,52 @@ void AMyGiftersCharacter::ChangeNonCombatPose()
 	}
 }
 
+void AMyGiftersCharacter::ThrowGrenade()
+{
+	if (!bIsDead && bIsCombat && CharacterStat->GetGrenadeCount() > 0)
+	{
+		PlayAnimMontage(ThrowGrenadeMontage);
+
+		if (CharacterStat->GetGrenadeCount() > 0)
+		{
+			FVector EyeLocation;
+			FRotator EyeRotation;
+			GetActorEyesViewPoint(EyeLocation, EyeRotation);
+
+			FVector ForwardDirection = EyeRotation.Vector();
+			FVector SpawnLocation = EyeLocation + ForwardDirection * 10.0f;
+			FRotator SpawnRotation = EyeRotation;
+
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			AGrenade* SpawnedGrenade = GetWorld()->SpawnActor<AGrenade>(GrenadeClass, SpawnLocation, SpawnRotation, SpawnParams);
+			if (SpawnedGrenade)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Spawn grenade Succeed"));
+				FVector LaunchVelocity = ForwardDirection * ThrowPower;
+				SpawnedGrenade->ThrowGrenade(LaunchVelocity);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Spawn grenade failed"));
+			}
+
+			CharacterStat->DecreaseGrenadeCount();
+		}
+	}
+}
+
+void AMyGiftersCharacter::RefillGrenade() const
+{
+
+	if (CharacterStat->GetGrenadeCount() < 3)
+	{
+		CharacterStat->IncreaseGrenadeCount();
+	}
+
+}
+
 void AMyGiftersCharacter::OnSelfDead()
 {
 	bIsDead = true;
@@ -417,6 +452,8 @@ void AMyGiftersCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 	PlayerInputComponent->BindAction("Combat", IE_Pressed, this, &AMyGiftersCharacter::ChangeCombatPose);
 	PlayerInputComponent->BindAction("Combat", IE_Released, this, &AMyGiftersCharacter::ChangeNonCombatPose);
+
+	PlayerInputComponent->BindAction("ThrowGrenade", IE_Pressed, this, &AMyGiftersCharacter::ThrowGrenade);
 }
 
 void AMyGiftersCharacter::PostInitializeComponents()
@@ -430,6 +467,8 @@ void AMyGiftersCharacter::PostInitializeComponents()
 void AMyGiftersCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetWorld()->GetTimerManager().SetTimer(GrenadeRefillTimerHandle, this, &AMyGiftersCharacter::RefillGrenade, 5.0f, true);
 
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->SetCustomDepthStencilValue(1);
@@ -459,7 +498,7 @@ void AMyGiftersCharacter::MoveRight(float Value)
 float AMyGiftersCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
-	if(bIsDead)
+	if (bIsDead)
 	{
 		return 0.0f;
 	}
@@ -471,7 +510,7 @@ float AMyGiftersCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Da
 		UE_LOG(LogTemp, Warning, TEXT("Player Dead"));
 		OnSelfDead();
 		//GetMesh()->GetAnimInstance()->Montage_Play(DeathMontage);
-		if(!GetMesh()->GetAnimInstance()->Montage_IsPlaying(DeathMontage))
+		if (!GetMesh()->GetAnimInstance()->Montage_IsPlaying(DeathMontage))
 		{
 			PlayAnimMontage(DeathMontage);
 		}

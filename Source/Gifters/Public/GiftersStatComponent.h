@@ -42,6 +42,12 @@ public:
 	void IncreaseKillMonsterCount(int Count);
 	int GetKillMonsterCount() const;
 
+	int GetGrenadeCount();
+	void SetGrenadeCount(int Count);
+
+	void IncreaseGrenadeCount();
+	void DecreaseGrenadeCount();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -66,4 +72,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = true))
 	int KillMonsterCount;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = true))
+	int GrenadeCount;
 };
