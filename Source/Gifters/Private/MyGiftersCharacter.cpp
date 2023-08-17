@@ -208,7 +208,7 @@ void AMyGiftersCharacter::Tick(float DeltaTime)
 void AMyGiftersCharacter::Attack()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Attack()"));
-	if (bIsCombat && !bIsDead)
+	if (bIsCombat && !bIsDead && !MyAnimInstance->Montage_IsPlaying(nullptr))
 	{
 		if (bIsAttacking)
 		{
