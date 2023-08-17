@@ -385,7 +385,7 @@ void AMyGiftersCharacter::ChangeNonCombatPose()
 
 void AMyGiftersCharacter::ThrowGrenade()
 {
-	if (!bIsDead && bIsCombat && CharacterStat->GetGrenadeCount() > 0)
+	if (!bIsDead && bIsCombat && !bIsAttacking && CharacterStat->GetGrenadeCount() > 0)
 	{
 		PlayAnimMontage(ThrowGrenadeMontage);
 
